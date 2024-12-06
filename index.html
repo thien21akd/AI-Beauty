@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Beauty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* Reset mặc định */
         * {
@@ -11,65 +12,81 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #121212, #2a5298);
             color: white;
             overflow-x: hidden;
+            scroll-behavior: smooth;
+            animation: fadeInBody 1s ease-in-out;
         }
 
         /* Header */
         header {
             background: rgba(0, 0, 0, 0.8);
-            padding: 20px 50px;
+            padding: 20px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 1000;
         }
+
         header h1 {
-            font-size: 26px;
-            color: #00ffcc;
+            font-size: 32px;
+            color: #ffcc00;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            animation: glowingTitle 3s infinite alternate;
         }
+
         nav a {
-            color: white;
+            color: #fff;
             text-decoration: none;
-            margin: 0 15px;
-            font-size: 22px;
-            font-weight: 500;
+            margin: 0 20px;
+            font-size: 18px;
+            font-weight: 600;
             position: relative;
+            transition: color 0.3s, transform 0.3s;
         }
+
+        nav a:hover {
+            color: #ffcc00;
+            transform: scale(1.1);
+        }
+
         nav a::after {
             content: '';
             display: block;
             width: 0;
             height: 2px;
-            background: #00ffcc;
-            transition: 0.3s;
+            background: #ffcc00;
+            transition: width 0.3s;
             position: absolute;
             bottom: -5px;
             left: 0;
         }
+
         nav a:hover::after {
             width: 100%;
         }
 
         /* Hero Section */
         .hero {
-            height: 90vh;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: url('https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080') no-repeat center center/cover;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             position: relative;
+            overflow: hidden;
         }
+
         .hero::before {
             content: '';
             position: absolute;
@@ -77,82 +94,148 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: url('https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080') no-repeat center center/cover;
+            opacity: 0.6;
+            filter: blur(3px);
         }
+
         .hero h2 {
-            font-size: 50px;
+            font-size: 60px;
             z-index: 1;
-            color: #00ffcc;
+            color: #ffcc00;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            animation: fadeInDown 2s ease-in-out;
         }
+
         .hero p {
-            font-size: 20px;
+            font-size: 24px;
             z-index: 1;
             margin: 20px 0;
             color: #e0e0e0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 2s ease-in-out;
         }
+
         .hero button {
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 15px 40px;
+            font-size: 20px;
             color: white;
-            background: #00ffcc;
+            background: linear-gradient(135deg, #ff3366, #ff6633);
             border: none;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: transform 0.3s, background 0.3s;
+            animation: bounce 3s infinite alternate;
         }
+
         .hero button:hover {
-            transform: scale(1.1);
+            transform: scale(1.2);
+            background: linear-gradient(135deg, #ff6633, #ff3366);
         }
 
         /* Upload Section */
         .upload-section {
-            padding: 50px 20px;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
             text-align: center;
+            color: #fff;
         }
+
         .upload-section h3 {
-            font-size: 28px;
+            font-size: 36px;
             margin-bottom: 20px;
             color: #ffcc33;
         }
+
         .upload-section input[type="file"] {
-            display: block;
-            margin: 20px auto;
-            background: #fff;
+            margin-top: 20px;
             padding: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            background: #ffcc00;
+            color: #000;
             cursor: pointer;
-            max-width: 300px;
+            transition: transform 0.3s;
         }
+
         .upload-section button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background: #ff3366;
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 20px;
             color: white;
+            background: linear-gradient(135deg, #ff3366, #ff6633);
             border: none;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
+            transition: transform 0.3s, background 0.3s;
         }
+
         .upload-section button:hover {
-            background: #ff6699;
-            transform: scale(1.1);
+            transform: scale(1.2);
+            background: linear-gradient(135deg, #ff6633, #ff3366);
         }
 
         /* Footer */
         footer {
             background: rgba(0, 0, 0, 0.9);
-            padding: 20px;
+            padding: 30px;
             text-align: center;
             color: #999;
-            font-size: 14px;
-            position: relative;
+            font-size: 16px;
         }
-        footer p {
-            margin: 5px 0;
+
+        /* Animations */
+        @keyframes glowingTitle {
+            from {
+                text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ffcc00, 0 0 20px #ffaa00;
+            }
+            to {
+                text-shadow: 0 0 20px #ffaa00, 0 0 30px #ffaa00, 0 0 40px #ffaa00;
+            }
         }
+
+        @keyframes fadeInBody {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -160,19 +243,19 @@
     <header>
         <h1>AI Beauty</h1>
         <nav>
-            <a href="#">Home</a>
-            <a href="#">AI Tư vấn</a>
-            <a href="#">Về chúng tôi</a>
-            <a href="#">Liên hệ</a>
+            <a href="#">Trang Chủ</a>
+            <a href="#">Sản Phẩm</a>
+            <a href="#">Giới Thiệu</a>
+            <a href="#">Liên Hệ</a>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <div class="hero">
         <div>
-            <h2>Tìm phong cách hoàn hảo của bạn</h2>
-            <p>Khám phá kiểu tóc & trang điểm phù hợp chỉ với vài bước đơn giản</p>
-            <button>Bắt đầu ngay</button>
+            <h2>Chào mừng đến AI Beauty</h2>
+            <p>Phân tích sắc đẹp bằng AI tiên tiến nhất</p>
+            <button>Bắt Đầu Ngay</button>
         </div>
     </div>
 
@@ -180,13 +263,10 @@
     <div class="upload-section">
         <h3>Tải ảnh của bạn để AI phân tích</h3>
         <input type="file" accept="image/*">
-        <button>Phân tích</button>
+        <button>Phân Tích</button>
     </div>
 
     <!-- Footer -->
-    <footer>
-        <p>© 2024 AI Hair Stylist. All rights reserved.</p>
-        <p>Powered by Artificial Intelligence</p>
-    </footer>
+   
 </body>
 </html>
