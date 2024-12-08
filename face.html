@@ -1,0 +1,12 @@
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script>
+  // Tải mô hình từ tệp model.json
+  async function loadModel() {
+    const model = await tf.loadLayersModel('https://thien21akd.github.io/AI-Beauty/models/model.json'); // Đảm bảo thay "path/to" với đường dẫn đến model.json của bạn
+    console.log("Model loaded");
+
+    // Sau khi mô hình đã được tải, bạn có thể sử dụng nó để dự đoán
+  }
+
+  loadModel();
+</script>
