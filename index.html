@@ -106,7 +106,7 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            animation: fadeInDown 2s ease-in-out;
+            animation: fadeInDown 3s  ease-in-out
         }
 
         .hero p {
@@ -243,7 +243,7 @@
     <header>
         <h1>AI Beauty</h1>
         <nav>
-            <a href="#">Trang Chủ</a>
+            <a href="index.html">Trang Chủ</a>
             <a href="products.html">Sản Phẩm</a>
             <a href="#">Giới Thiệu</a>
             <a href="#">Liên Hệ</a>
@@ -255,10 +255,14 @@
         <div>
             <h2>Chào mừng đến AI Beauty</h2>
             <p>Phân tích sắc đẹp bằng AI tiên tiến nhất</p>
-            <button>Bắt Đầu Ngay</button>
+            <button name="button" value="OK" type="button" onclick="turn_on_camera()">Bắt Đầu Ngay</button>
+            <script>
+              function turn_on_camera(){
+                alert("Hãy bật camera để bắt đầu cho AI nhận diện");
+              }
+            </script>
         </div>
     </div>
-
     <!-- Upload Section -->
     <div class="upload-section">
         <h3>Tải ảnh của bạn để AI phân tích</h3>
