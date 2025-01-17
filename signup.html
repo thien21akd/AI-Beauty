@@ -38,27 +38,53 @@
             width: auto;
             margin-right: 10px;
         }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <h2>Thông tin đăng kí</h2>
     <form>
         <label for="fullname">Họ và tên</label>
-        <input id="fullname" type="text" name="fullname" required>
+        <input id = "fullname" type="text" name="fullname" required>
         <label for="cccd">Số CCCD</label>
         <input id="cccd" type="number" name="cccd" required>
         <label for="dob">Ngày sinh</label>
         <input id="dob" type="date" name="dob" required>
+        <label for="username">Tên người dùng</label>
+        <input id="username" type="text" name="username" required>
         <label for="matkhau">Mật khẩu</label>
-        <input id ="matkhau" type ="password" required>
+        <input id="matkhau" type="password" name="matkhau" required>
+        <label for="nhaplai">Nhập lại mật khẩu</label>
+        <input id="nhaplai" type="password" name="nhaplai" required>
         <label>Giới tính</label>
         <label for="male">Nam</label>
         <input type="radio" id="male" name="gender" value="Nam" required>
         <label for="female">Nữ</label>
         <input type="radio" id="female" name="gender" value="Nữ" required>
-        <label for="male">Khác</label>
-        <input type="radio" id="male" name="gender" value="Khác" required>
+        <label for="other">Khác</label>
+        <input type="radio" id="other" name="gender" value="Khác" required>
         <button type="submit">Đăng Kí</button>
     </form>
+    <script>
+        let password = document.getElementById('matkhau');
+        let confirmPassword = document.getElementById('nhaplai');
+        if(password.type === 'password') {
+            password.type = 'text';
+            confirmPassword.type = 'text';
+        }
+    </script>
 </body>
 </html>
