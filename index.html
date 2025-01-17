@@ -239,7 +239,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <h1>AI Beauty</h1>
         <nav>
@@ -247,31 +246,52 @@
             <a href="products.html">Sản Phẩm</a>
             <a href="introduce.html">Giới Thiệu</a>
             <a href="signup.html">Đăng Kí</a>
-            <a href = "#">Đăng Nhập</a>
+            <a href="#">Đăng Nhập</a>
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <div class="hero">
         <div>
             <h2>Chào mừng đến AI Beauty</h2>
             <p>Phân tích sắc đẹp bằng AI tiên tiến nhất</p>
             <button name="button" value="OK" type="button" onclick="turn_on_camera()">Bắt Đầu Ngay</button>
             <script>
-              function turn_on_camera(){
-                alert("Hãy bật camera để bắt đầu cho AI nhận diện");
-              }
+                function turn_on_camera(){
+                    alert("Hãy bật camera để bắt đầu cho AI nhận diện");
+                    setupCamera();
+                }
+                function setupCamera() {
+                    const video = document.createElement('video');
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    video.setAttribute("width", "640");
+                    video.setAttribute("height", "480");
+                    document.body.appendChild(video);
+                    document.body.appendChild(canvas);
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then((stream) => {
+                            video.srcObject = stream;
+                            video.play();
+                            video.addEventListener('play', function () {
+                                (function loop() {
+                                    if (!video.paused && !video.ended) {
+                                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                        setTimeout(loop, 1000 / 30);
+                                    }
+                                })();
+                            });
+                        })
+                        .catch(function (error) {
+                            console.error("Có lỗi xảy ra khi truy cập webcam:", error);
+                        });
+                }
             </script>
         </div>
     </div>
-    <!-- Upload Section -->
     <div class="upload-section">
         <h3>Tải ảnh của bạn để AI phân tích</h3>
         <input type="file" accept="image/*">
         <button>Phân Tích</button>
     </div>
-
-    <!-- Footer -->
-   
 </body>
 </html>
