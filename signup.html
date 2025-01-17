@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Kí</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -52,13 +53,25 @@
         button:hover {
             background-color: #45a049;
         }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h2>Thông tin đăng kí</h2>
     <form>
         <label for="fullname">Họ và tên</label>
-        <input id = "fullname" type="text" name="fullname" required>
+        <input id="fullname" type="text" name="fullname" required>
         <label for="cccd">Số CCCD</label>
         <input id="cccd" type="number" name="cccd" required>
         <label for="dob">Ngày sinh</label>
@@ -66,9 +79,16 @@
         <label for="username">Tên người dùng</label>
         <input id="username" type="text" name="username" required>
         <label for="matkhau">Mật khẩu</label>
-        <input id="matkhau" type="password" name="matkhau" required>
+        <div class="password-wrapper">
+            <input id="matkhau" type="password" name="matkhau" required>
+            <i id="toggle-eye" class="fas fa-eye eye-icon"></i> <!-- Eye icon -->
+        </div>
+
         <label for="nhaplai">Nhập lại mật khẩu</label>
-        <input id="nhaplai" type="password" name="nhaplai" required>
+        <div class="password-wrapper">
+            <input id="nhaplai" type="password" name="nhaplai" required>
+            <i id="toggle-eye2" class="fas fa-eye eye-icon"></i> <!-- Eye icon for re-enter password -->
+        </div>
         <label>Giới tính</label>
         <label for="male">Nam</label>
         <input type="radio" id="male" name="gender" value="Nam" required>
@@ -79,12 +99,34 @@
         <button type="submit">Đăng Kí</button>
     </form>
     <script>
-        let password = document.getElementById('matkhau');
-        let confirmPassword = document.getElementById('nhaplai');
-        if(password.type === 'password') {
-            password.type = 'text';
-            confirmPassword.type = 'text';
-        }
+        const matkhauElement = document.querySelector('#matkhau');
+        const nhaplaiElement = document.querySelector('#nhaplai');
+        const toggleEye = document.querySelector('#toggle-eye');
+        const toggleEye2 = document.querySelector('#toggle-eye2');
+        toggleEye.addEventListener('click', function() {
+            const currentType = matkhauElement.getAttribute('type');
+            if (currentType === 'password') {
+                matkhauElement.setAttribute('type', 'text');
+                toggleEye.classList.remove('fa-eye');
+                toggleEye.classList.add('fa-eye-slash');
+            } else {
+                matkhauElement.setAttribute('type', 'password');
+                toggleEye.classList.remove('fa-eye-slash');
+                toggleEye.classList.add('fa-eye');
+            }
+        });
+        toggleEye2.addEventListener('click', function() {
+            const currentType = nhaplaiElement.getAttribute('type');
+            if (currentType === 'password') {
+                nhaplaiElement.setAttribute('type', 'text');
+                toggleEye2.classList.remove('fa-eye');
+                toggleEye2.classList.add('fa-eye-slash');
+            } else {
+                nhaplaiElement.setAttribute('type', 'password');
+                toggleEye2.classList.remove('fa-eye-slash');
+                toggleEye2.classList.add('fa-eye');
+            }
+        });
     </script>
 </body>
 </html>
