@@ -6,7 +6,6 @@
     <title>AI Beauty</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset mặc định */
         * {
             margin: 0;
             padding: 0;
@@ -21,8 +20,6 @@
             scroll-behavior: smooth;
             animation: fadeInBody 1s ease-in-out;
         }
-
-        /* Header */
         header {
             background: rgba(0, 0, 0, 0.8);
             padding: 20px 60px;
@@ -106,7 +103,7 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            animation: fadeInDown 3s  ease-in-out
+            animation: fadeInDown 3s ease-in-out;
         }
 
         .hero p {
@@ -134,21 +131,17 @@
             transform: scale(1.2);
             background: linear-gradient(135deg, #ff6633, #ff3366);
         }
-
-        /* Upload Section */
         .upload-section {
             padding: 60px 20px;
             background: linear-gradient(135deg, #2a5298, #1e3c72);
             text-align: center;
             color: #fff;
         }
-
         .upload-section h3 {
             font-size: 36px;
             margin-bottom: 20px;
             color: #ffcc33;
         }
-
         .upload-section input[type="file"] {
             margin-top: 20px;
             padding: 10px;
@@ -159,7 +152,6 @@
             cursor: pointer;
             transition: transform 0.3s;
         }
-
         .upload-section button {
             margin-top: 20px;
             padding: 15px 40px;
@@ -176,8 +168,6 @@
             transform: scale(1.2);
             background: linear-gradient(135deg, #ff6633, #ff3366);
         }
-
-        /* Footer */
         footer {
             background: rgba(0, 0, 0, 0.9);
             padding: 30px;
@@ -185,8 +175,6 @@
             color: #999;
             font-size: 16px;
         }
-
-        /* Animations */
         @keyframes glowingTitle {
             from {
                 text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ffcc00, 0 0 20px #ffaa00;
@@ -195,7 +183,6 @@
                 text-shadow: 0 0 20px #ffaa00, 0 0 30px #ffaa00, 0 0 40px #ffaa00;
             }
         }
-
         @keyframes fadeInBody {
             from {
                 opacity: 0;
@@ -204,7 +191,6 @@
                 opacity: 1;
             }
         }
-
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -226,7 +212,6 @@
                 transform: translateY(0);
             }
         }
-
         @keyframes bounce {
             from {
                 transform: translateY(0);
@@ -235,7 +220,6 @@
                 transform: translateY(-10px);
             }
         }
-
     </style>
 </head>
 <body>
@@ -254,44 +238,107 @@
         <div>
             <h2>Chào mừng đến AI Beauty</h2>
             <p>Phân tích sắc đẹp bằng AI tiên tiến nhất</p>
-            <button name="button" value="OK" type="button" onclick="turn_on_camera()">Bắt Đầu Ngay</button>
-            <script>
-                function turn_on_camera(){
-                    alert("Hãy bật camera để bắt đầu cho AI nhận diện");
-                    setupCamera();
-                }
-                function setupCamera() {
-                    const video = document.createElement('video');
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    video.setAttribute("width", "640");
-                    video.setAttribute("height", "480");
-                    document.body.appendChild(video);
-                    document.body.appendChild(canvas);
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then((stream) => {
-                            video.srcObject = stream;
-                            video.play();
-                            video.addEventListener('play', function () {
-                                (function loop() {
-                                    if (!video.paused && !video.ended) {
-                                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                        setTimeout(loop, 1000 / 30);
-                                    }
-                                })();
-                            });
-                        })
-                        .catch(function (error) {
-                            console.error("Có lỗi xảy ra khi truy cập webcam:", error);
-                        });
-                }
-            </script>
+            <button onclick="openCamera()">Bắt Đầu Ngay</button>
         </div>
     </div>
+
     <div class="upload-section">
-        <h3>Tải ảnh của bạn để AI phân tích</h3>
-        <input type="file" accept="image/*">
-        <button>Phân Tích</button>
+        <h3>Tải ảnh của bạn hoặc bật camera để AI phân tích</h3>
+        <input type="file" accept="image/*" id="imageUpload">
+        <button onclick="analyzeImage()">Phân Tích Ảnh</button>
+        <div>
+            <video id="camera" autoplay playsinline style="display: none; width: 100%; max-width: 600px; border-radius: 10px;"></video>
+            <canvas id="snapshot" style="display: none; width: 100%; max-width: 600px; margin-top: 20px; border-radius: 10px;"></canvas>
+            <button id="captureButton" onclick="capturePhoto()" style="display: none; margin-top: 20px;">Chụp Ảnh</button>
+            <button id="analyzeButton" onclick="analyzeCapturedImage()" style="display: none; margin-top: 20px;">Phân Tích Ảnh Chụp</button>
+        </div>
     </div>
+
+    <div id="suggestions" style="display: none; text-align: center; color: #fff; margin-top: 40px;">
+        <h3>Gợi ý chỉnh sửa khuôn mặt của bạn</h3>
+        <p id="suggestionsText"></p>
+    </div>
+    <footer>
+        <p>&copy; 2025 AI Beauty. All rights reserved.</p>
+    </footer>
+    <script>
+        const camera = document.getElementById('camera');
+        const snapshot = document.getElementById('snapshot');
+        const captureButton = document.getElementById('captureButton');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const suggestionsText = document.getElementById('suggestionsText');
+        const suggestionsSection = document.getElementById('suggestions');
+        async function loadModels() {
+            try {
+                await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+                await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+                await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+                console.log("Mô hình đã được tải thành công.");
+            } catch (err) {
+                console.error("Không thể tải mô hình: ", err);
+            }
+        }
+        async function openCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                camera.srcObject = stream;
+                camera.style.display = 'block';
+                captureButton.style.display = 'inline-block';
+                await loadModels();
+            } catch (err) {
+                alert('Không thể mở camera: ' + err.message);
+            }
+        }
+        function capturePhoto() {
+            const ctx = snapshot.getContext('2d');
+            snapshot.width = camera.videoWidth;
+            snapshot.height = camera.videoHeight;
+            ctx.drawImage(camera, 0, 0);
+            snapshot.style.display = 'block';
+            analyzeButton.style.display = 'inline-block';
+        }
+        async function analyzeImage() {
+            const fileInput = document.getElementById('imageUpload');
+            if (fileInput.files.length === 0) {
+                alert('Vui lòng chọn một ảnh!');
+                return;
+            }
+            const file = fileInput.files[0];
+            const image = await faceapi.bufferToImage(file);
+            analyzeFace(image);
+        }
+        function analyzeCapturedImage() {
+            snapshot.toBlob(async (blob) => {
+                if (blob) {
+                    const image = await faceapi.bufferToImage(blob);
+                    analyzeFace(image);
+                }
+            }, 'image/png');
+        }
+        async function analyzeFace(image) {
+            const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
+            if (detections) {
+                console.log('Khuôn mặt được phát hiện:', detections);
+                const landmarks = detections.landmarks;
+                showSuggestions(landmarks);
+            } else {
+                alert('Không phát hiện khuôn mặt nào.');
+            }
+        }
+        function showSuggestions(landmarks) {
+            let suggestions = '';
+
+            if (landmarks.getMouth().length > 0) {
+                suggestions += 'Cười nhiều hơn để khuôn mặt rạng rỡ hơn!<br>';
+            }
+            if (landmarks.getLeftEye().length > 0 && landmarks.getRightEye().length > 0) {
+                suggestions += 'Hãy thử nhìn thẳng vào camera để có bức ảnh đẹp hơn!<br>';
+            }
+
+            suggestionsText.innerHTML = suggestions;
+            suggestionsSection.style.display = 'block';
+        }
+
+    </script>
 </body>
 </html>
