@@ -131,17 +131,20 @@
             transform: scale(1.2);
             background: linear-gradient(135deg, #ff6633, #ff3366);
         }
+
         .upload-section {
             padding: 60px 20px;
             background: linear-gradient(135deg, #2a5298, #1e3c72);
             text-align: center;
             color: #fff;
         }
+
         .upload-section h3 {
             font-size: 36px;
             margin-bottom: 20px;
             color: #ffcc33;
         }
+
         .upload-section input[type="file"] {
             margin-top: 20px;
             padding: 10px;
@@ -152,6 +155,7 @@
             cursor: pointer;
             transition: transform 0.3s;
         }
+
         .upload-section button {
             margin-top: 20px;
             padding: 15px 40px;
@@ -168,6 +172,7 @@
             transform: scale(1.2);
             background: linear-gradient(135deg, #ff6633, #ff3366);
         }
+
         footer {
             background: rgba(0, 0, 0, 0.9);
             padding: 30px;
@@ -175,6 +180,23 @@
             color: #999;
             font-size: 16px;
         }
+
+        /* History Modal */
+        #historyModal {
+            display: none;
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+            max-width: 80%;
+            overflow-y: auto;
+        }
+
         @keyframes glowingTitle {
             from {
                 text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ffcc00, 0 0 20px #ffaa00;
@@ -183,6 +205,7 @@
                 text-shadow: 0 0 20px #ffaa00, 0 0 30px #ffaa00, 0 0 40px #ffaa00;
             }
         }
+
         @keyframes fadeInBody {
             from {
                 opacity: 0;
@@ -191,6 +214,7 @@
                 opacity: 1;
             }
         }
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -212,6 +236,7 @@
                 transform: translateY(0);
             }
         }
+
         @keyframes bounce {
             from {
                 transform: translateY(0);
@@ -246,12 +271,20 @@
         <h3>Tải ảnh của bạn hoặc bật camera để AI phân tích</h3>
         <input type="file" accept="image/*" id="imageUpload">
         <button onclick="analyzeImage()">Phân Tích Ảnh</button>
+        <button onclick="viewHistory()">Xem Lịch Sử Phân Tích</button>
         <div>
             <video id="camera" autoplay playsinline style="display: none; width: 100%; max-width: 600px; border-radius: 10px;"></video>
             <canvas id="snapshot" style="display: none; width: 100%; max-width: 600px; margin-top: 20px; border-radius: 10px;"></canvas>
             <button id="captureButton" onclick="capturePhoto()" style="display: none; margin-top: 20px;">Chụp Ảnh</button>
             <button id="analyzeButton" onclick="analyzeCapturedImage()" style="display: none; margin-top: 20px;">Phân Tích Ảnh Chụp</button>
         </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal">
+        <h3>Lịch Sử Phân Tích</h3>
+        <ul id="historyList"></ul>
+        <button onclick="closeHistory()">Đóng</button>
     </div>
 
     <div id="suggestions" style="display: none; text-align: center; color: #fff; margin-top: 40px;">
@@ -261,6 +294,8 @@
     <footer>
         <p>&copy; 2025 AI Beauty. All rights reserved.</p>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
     <script>
         const camera = document.getElementById('camera');
         const snapshot = document.getElementById('snapshot');
@@ -268,6 +303,8 @@
         const analyzeButton = document.getElementById('analyzeButton');
         const suggestionsText = document.getElementById('suggestionsText');
         const suggestionsSection = document.getElementById('suggestions');
+        const historyKey = 'analysisHistory';
+
         async function loadModels() {
             try {
                 await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
@@ -278,6 +315,7 @@
                 console.error("Không thể tải mô hình: ", err);
             }
         }
+
         async function openCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -289,6 +327,7 @@
                 alert('Không thể mở camera: ' + err.message);
             }
         }
+
         function capturePhoto() {
             const ctx = snapshot.getContext('2d');
             snapshot.width = camera.videoWidth;
@@ -297,6 +336,7 @@
             snapshot.style.display = 'block';
             analyzeButton.style.display = 'inline-block';
         }
+
         async function analyzeImage() {
             const fileInput = document.getElementById('imageUpload');
             if (fileInput.files.length === 0) {
@@ -307,6 +347,7 @@
             const image = await faceapi.bufferToImage(file);
             analyzeFace(image);
         }
+
         function analyzeCapturedImage() {
             snapshot.toBlob(async (blob) => {
                 if (blob) {
@@ -315,6 +356,7 @@
                 }
             }, 'image/png');
         }
+
         async function analyzeFace(image) {
             const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
             if (detections) {
@@ -325,6 +367,7 @@
                 alert('Không phát hiện khuôn mặt nào.');
             }
         }
+
         function showSuggestions(landmarks) {
             let suggestions = '';
 
@@ -337,8 +380,47 @@
 
             suggestionsText.innerHTML = suggestions;
             suggestionsSection.style.display = 'block';
+
+            storeAnalysisResult(suggestions);
         }
 
+        function storeAnalysisResult(suggestions) {
+            const history = JSON.parse(localStorage.getItem(historyKey)) || [];
+
+            const newEntry = {
+                timestamp: new Date().toLocaleString(),
+                suggestions: suggestions
+            };
+
+            history.unshift(newEntry);
+            if (history.length > 5) {
+                history.pop(); 
+            }
+
+            localStorage.setItem(historyKey, JSON.stringify(history));
+        }
+
+        function viewHistory() {
+            const history = JSON.parse(localStorage.getItem(historyKey)) || [];
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<li>Chưa có phân tích nào.</li>';
+            } else {
+                history.forEach(entry => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `<strong>${entry.timestamp}</strong>: ${entry.suggestions}`;
+                    historyList.appendChild(listItem);
+                });
+            }
+
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
