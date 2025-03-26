@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Beauty</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>AI Beauty | Phân tích sắc đẹp bằng AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #2a2a2a;
+            --secondary: #f8f8f8;
+            --accent: #ff6b6b;
+            --accent-light: #ff8e8e;
+            --text-dark: #333;
+            --text-light: #777;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,63 +28,90 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #121212, #2a5298);
-            color: white;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--secondary);
+            color: var(--text-dark);
             overflow-x: hidden;
-            scroll-behavior: smooth;
-            animation: fadeInBody 1s ease-in-out;
+            line-height: 1.6;
         }
-        header {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px 60px;
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-            position: sticky;
-            top: 0;
             z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
         }
 
-        header h1 {
-            font-size: 32px;
-            color: #ffcc00;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            animation: glowingTitle 3s infinite alternate;
-        }
-
-        nav a {
-            color: #fff;
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 18px;
-            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
             position: relative;
-            transition: color 0.3s, transform 0.3s;
+            transition: var(--transition);
         }
 
-        nav a:hover {
-            color: #ffcc00;
-            transform: scale(1.1);
-        }
-
-        nav a::after {
+        .nav-links a::after {
             content: '';
-            display: block;
-            width: 0;
-            height: 2px;
-            background: #ffcc00;
-            transition: width 0.3s;
             position: absolute;
             bottom: -5px;
             left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
         }
 
-        nav a:hover::after {
+        .nav-links a:hover::after {
             width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        .nav-cta {
+            padding: 0.7rem 1.5rem;
+            background: var(--gradient-accent);
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
         }
 
         /* Hero Section */
@@ -77,11 +119,12 @@
             height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 0 5%;
+            background: var(--gradient);
+            color: white;
             position: relative;
             overflow: hidden;
+            margin-top: 80px;
         }
 
         .hero::before {
@@ -91,336 +134,1246 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080') no-repeat center center/cover;
-            opacity: 0.6;
-            filter: blur(3px);
+            background: url('https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+            opacity: 0.15;
         }
 
-        .hero h2 {
-            font-size: 60px;
+        .hero-content {
+            max-width: 600px;
             z-index: 1;
-            color: #ffcc00;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
             text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            animation: fadeInDown 3s ease-in-out;
+            font-weight: 500;
         }
 
-        .hero p {
-            font-size: 24px;
-            z-index: 1;
-            margin: 20px 0;
-            color: #e0e0e0;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-            animation: fadeInUp 2s ease-in-out;
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
         }
 
-        .hero button {
-            padding: 15px 40px;
-            font-size: 20px;
-            color: white;
-            background: linear-gradient(135deg, #ff3366, #ff6633);
-            border: none;
+        .hero-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: white;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
             border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-            animation: bounce 3s infinite alternate;
+            transition: var(--transition);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .hero button:hover {
-            transform: scale(1.2);
-            background: linear-gradient(135deg, #ff6633, #ff3366);
+        .hero-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
 
+        /* Features Section */
+        .features {
+            padding: 6rem 5%;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .section-main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: var(--secondary);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Analysis Section */
+        .analysis {
+            padding: 6rem 5%;
+            background: var(--secondary);
+        }
+
+        .analysis-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .analysis-image {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .analysis-image img {
+            width: 100%;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .analysis-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .analysis-content {
+            padding: 2rem 0;
+        }
+
+        .analysis-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .analysis-text {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .analysis-steps {
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .step-content p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Upload Section */
         .upload-section {
-            padding: 60px 20px;
-            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            padding: 4rem 5%;
+            background: white;
             text-align: center;
-            color: #fff;
         }
 
-        .upload-section h3 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #ffcc33;
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--secondary);
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
         }
 
-        .upload-section input[type="file"] {
-            margin-top: 20px;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
-            background: #ffcc00;
-            color: #000;
+        .upload-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .upload-subtitle {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .upload-options {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-btn {
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 50px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .upload-section button {
-            margin-top: 20px;
-            padding: 15px 40px;
-            font-size: 20px;
+        .upload-btn:hover {
+            background: var(--accent);
             color: white;
-            background: linear-gradient(135deg, #ff3366, #ff6633);
+            transform: translateY(-3px);
+        }
+
+        .upload-btn i {
+            font-size: 1.2rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .camera-preview {
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            margin: 0 auto;
+            display: none;
+        }
+
+        .capture-btn {
+            margin-top: 1.5rem;
+            padding: 0.8rem 2rem;
+            background: var(--accent);
+            color: white;
             border: none;
             border-radius: 50px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-        }
-
-        .upload-section button:hover {
-            transform: scale(1.2);
-            background: linear-gradient(135deg, #ff6633, #ff3366);
-        }
-
-        footer {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            text-align: center;
-            color: #999;
-            font-size: 16px;
-        }
-
-        /* History Modal */
-        #historyModal {
+            transition: var(--transition);
             display: none;
+        }
+
+        .capture-btn:hover {
+            background: var(--accent-light);
+            transform: translateY(-3px);
+        }
+
+        .analyze-btn {
+            margin-top: 1.5rem;
+            padding: 0.8rem 2rem;
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Results Section */
+        .results-section {
+            padding: 6rem 5%;
+            background: var(--secondary);
+            display: none;
+        }
+
+        .results-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .results-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--primary);
             text-align: center;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 10px;
-            max-width: 80%;
-            overflow-y: auto;
         }
 
-        @keyframes glowingTitle {
-            from {
-                text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ffcc00, 0 0 20px #ffaa00;
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .result-image {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .result-image img {
+            width: 100%;
+            display: block;
+        }
+
+        .result-analysis {
+            padding: 1rem;
+        }
+
+        .result-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-category {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-category i {
+            font-size: 1.2rem;
+        }
+
+        .result-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .result-score {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .score-bar {
+            flex-grow: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin-right: 1rem;
+            overflow: hidden;
+        }
+
+        .score-progress {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 4px;
+            width: 0;
+            transition: width 1s ease;
+        }
+
+        .score-value {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .result-actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.8rem 2rem;
+            background: white;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* History Section */
+        .history-section {
+            padding: 6rem 5%;
+            background: white;
+            display: none;
+        }
+
+        .history-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .history-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .history-card {
+            background: var(--secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .history-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .history-card:hover .history-image img {
+            transform: scale(1.05);
+        }
+
+        .history-content {
+            padding: 1.5rem;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .history-analysis {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .history-view {
+            display: inline-block;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .history-view:hover {
+            color: var(--accent-light);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 5rem 5% 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-col h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer-col p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+            line-height: 1.8;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .analysis-container {
+                grid-template-columns: 1fr;
             }
-            to {
-                text-shadow: 0 0 20px #ffaa00, 0 0 30px #ffaa00, 0 0 40px #ffaa00;
+            
+            .analysis-image {
+                order: -1;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-image {
+                margin-bottom: 2rem;
             }
         }
 
-        @keyframes fadeInBody {
-            from {
-                opacity: 0;
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
             }
-            to {
-                opacity: 1;
+            
+            .hero-title {
+                font-size: 2.5rem;
             }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50%);
+            
+            .section-main-title {
+                font-size: 2rem;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50%);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            .upload-options {
+                flex-direction: column;
+                align-items: center;
             }
         }
 
-        @keyframes bounce {
-            from {
-                transform: translateY(0);
+        @media (max-width: 576px) {
+            .hero {
+                padding: 0 8%;
             }
-            to {
-                transform: translateY(-10px);
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .hero-btn {
+                padding: 0.8rem 2rem;
+            }
+            
+            .section {
+                padding: 5rem 8%;
+            }
+            
+            .section-main-title {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>AI Beauty</h1>
-        <nav>
-            <a href="index.html">Trang Chủ</a>
-            <a href="products.html">Sản Phẩm</a>
-            <a href="introduce.html">Giới Thiệu</a>
-            <a href="signup.html">Đăng Kí</a>
-            <a href="#">Đăng Nhập</a>
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo">AI<span>Beauty</span></a>
+        
+        <nav class="nav-links">
+            <a href="#" class="active">Trang chủ</a>
+            <a href="#">Tính năng</a>
+            <a href="#">Cách hoạt động</a>
+            <a href="#">Lịch sử</a>
+            <a href="#">Liên hệ</a>
         </nav>
+        
+        <a href="#" class="nav-cta">Đăng nhập</a>
     </header>
 
-    <div class="hero">
-        <div>
-            <h2>Chào mừng đến AI Beauty</h2>
-            <p>Phân tích sắc đẹp bằng AI tiên tiến nhất</p>
-            <button onclick="openCamera()">Bắt Đầu Ngay</button>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <p class="hero-subtitle">Công nghệ AI tiên tiến</p>
+            <h1 class="hero-title">Phân tích sắc đẹp bằng trí tuệ nhân tạo</h1>
+            <p class="hero-text">Khám phá vẻ đẹp tiềm ẩn của bạn với công nghệ AI hiện đại. Nhận phân tích chi tiết và gợi ý cải thiện ngoại hình cá nhân hóa.</p>
+            <a href="#upload" class="hero-btn">Bắt đầu ngay</a>
         </div>
-    </div>
+    </section>
 
-    <div class="upload-section">
-        <h3>Tải ảnh của bạn hoặc bật camera để AI phân tích</h3>
-        <input type="file" accept="image/*" id="imageUpload">
-        <button onclick="analyzeImage()">Phân Tích Ảnh</button>
-        <button onclick="viewHistory()">Xem Lịch Sử Phân Tích</button>
-        <div>
-            <video id="camera" autoplay playsinline style="display: none; width: 100%; max-width: 600px; border-radius: 10px;"></video>
-            <canvas id="snapshot" style="display: none; width: 100%; max-width: 600px; margin-top: 20px; border-radius: 10px;"></canvas>
-            <button id="captureButton" onclick="capturePhoto()" style="display: none; margin-top: 20px;">Chụp Ảnh</button>
-            <button id="analyzeButton" onclick="analyzeCapturedImage()" style="display: none; margin-top: 20px;">Phân Tích Ảnh Chụp</button>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-title">
+            <p class="section-subtitle">Tính năng nổi bật</p>
+            <h2 class="section-main-title">Vì sao chọn AI Beauty?</h2>
         </div>
-    </div>
 
-    <!-- History Modal -->
-    <div id="historyModal">
-        <h3>Lịch Sử Phân Tích</h3>
-        <ul id="historyList"></ul>
-        <button onclick="closeHistory()">Đóng</button>
-    </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">Công nghệ AI tiên tiến</h3>
+                <p class="feature-text">Sử dụng thuật toán học máy hiện đại để phân tích 68 điểm trên khuôn mặt với độ chính xác cao.</p>
+            </div>
 
-    <div id="suggestions" style="display: none; text-align: center; color: #fff; margin-top: 40px;">
-        <h3>Gợi ý chỉnh sửa khuôn mặt của bạn</h3>
-        <p id="suggestionsText"></p>
-    </div>
-    <footer>
-        <p>&copy; 2025 AI Beauty. All rights reserved.</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Đánh giá toàn diện</h3>
+                <p class="feature-text">Phân tích tỷ lệ vàng, đối xứng khuôn mặt, da, mắt, mũi, miệng và nhiều yếu tố khác.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="feature-title">Gợi ý cải thiện</h3>
+                <p class="feature-text">Đưa ra các đề xuất cá nhân hóa để tối ưu hóa vẻ đẹp tự nhiên của bạn.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section class="analysis">
+        <div class="analysis-container">
+            <div class="analysis-image">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80" alt="Phân tích khuôn mặt bằng AI">
+            </div>
+            <div class="analysis-content">
+                <h2 class="analysis-title">Cách AI Beauty hoạt động</h2>
+                <p class="analysis-text">Hệ thống của chúng tôi sử dụng mạng nơ-ron sâu để phân tích các đặc điểm khuôn mặt của bạn và so sánh với các tiêu chuẩn sắc đẹp toàn cầu.</p>
+                
+                <div class="analysis-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Tải ảnh lên hoặc bật camera</h4>
+                            <p>Chọn ảnh từ thiết bị hoặc chụp ảnh trực tiếp bằng camera</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Phân tích bằng AI</h4>
+                            <p>Hệ thống sẽ quét và phân tích 68 điểm trên khuôn mặt bạn</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Nhận kết quả chi tiết</h4>
+                            <p>Xem báo cáo đánh giá và gợi ý cải thiện ngoại hình</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section class="upload-section" id="upload">
+        <div class="upload-container">
+            <h2 class="upload-title">Bắt đầu phân tích ngay</h2>
+            <p class="upload-subtitle">Tải ảnh của bạn lên hoặc bật camera để AI phân tích vẻ đẹp của bạn</p>
+            
+            <div class="upload-options">
+                <button class="upload-btn" id="uploadPhotoBtn">
+                    <i class="fas fa-upload"></i> Tải ảnh lên
+                </button>
+                <button class="upload-btn" id="openCameraBtn">
+                    <i class="fas fa-camera"></i> Mở camera
+                </button>
+            </div>
+            
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
+            
+            <div class="preview-container" id="previewContainer">
+                <img id="previewImage" class="preview-image" style="display: none;">
+                <video id="cameraPreview" class="camera-preview" autoplay playsinline style="display: none;"></video>
+                <canvas id="snapshot" style="display: none;"></canvas>
+                <button class="capture-btn" id="captureBtn">Chụp ảnh</button>
+            </div>
+            
+            <button class="analyze-btn" id="analyzeBtn" style="display: none;">Phân tích ngay</button>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+        <div class="results-container">
+            <h2 class="results-title">Kết quả phân tích của bạn</h2>
+            
+            <div class="results-grid">
+                <div class="result-image">
+                    <img id="resultImage" src="" alt="Ảnh đã phân tích">
+                </div>
+                
+                <div class="result-analysis">
+                    <div class="result-item">
+                        <div class="result-category">
+                            <i class="fas fa-star"></i> Điểm tổng quan
+                        </div>
+                        <p class="result-text" id="overallScore">Đang phân tích...</p>
+                        <div class="result-score">
+                            <div class="score-bar">
+                                <div class="score-progress" id="overallProgress"></div>
+                            </div>
+                            <span class="score-value" id="overallValue">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-category">
+                            <i class="fas fa-arrows-alt-h"></i> Đối xứng khuôn mặt
+                        </div>
+                        <p class="result-text" id="symmetryText">Đang phân tích...</p>
+                        <div class="result-score">
+                            <div class="score-bar">
+                                <div class="score-progress" id="symmetryProgress"></div>
+                            </div>
+                            <span class="score-value" id="symmetryValue">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-category">
+                            <i class="fas fa-gem"></i> Tỷ lệ vàng
+                        </div>
+                        <p class="result-text" id="goldenRatioText">Đang phân tích...</p>
+                        <div class="result-score">
+                            <div class="score-bar">
+                                <div class="score-progress" id="goldenRatioProgress"></div>
+                            </div>
+                            <span class="score-value" id="goldenRatioValue">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-category">
+                            <i class="fas fa-lightbulb"></i> Gợi ý cải thiện
+                        </div>
+                        <p class="result-text" id="suggestionsText">Đang phân tích...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="action-btn" id="saveResultBtn">
+                    <i class="fas fa-save"></i> Lưu kết quả
+                </button>
+                <button class="action-btn primary" id="newAnalysisBtn">
+                    <i class="fas fa-redo"></i> Phân tích mới
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="history-section" id="historySection">
+        <div class="history-container">
+            <h2 class="history-title">Lịch sử phân tích của bạn</h2>
+            
+            <div class="history-grid" id="historyGrid">
+                <!-- History items will be added here dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>AI Beauty</h3>
+                <p>Ứng dụng phân tích sắc đẹp bằng trí tuệ nhân tạo tiên tiến nhất hiện nay.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Liên kết</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Trang chủ</a></li>
+                    <li><a href="#">Tính năng</a></li>
+                    <li><a href="#">Cách hoạt động</a></li>
+                    <li><a href="#">Lịch sử</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Hỗ trợ</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Hướng dẫn sử dụng</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Liên hệ</h3>
+                <p>Email: support@aibeauty.com</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 AI Beauty. All rights reserved.</p>
+        </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
     <script>
-        const camera = document.getElementById('camera');
-        const snapshot = document.getElementById('snapshot');
-        const captureButton = document.getElementById('captureButton');
-        const analyzeButton = document.getElementById('analyzeButton');
-        const suggestionsText = document.getElementById('suggestionsText');
-        const suggestionsSection = document.getElementById('suggestions');
-        const historyKey = 'analysisHistory';
-
-        async function loadModels() {
-            try {
-                await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-                await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-                await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-                console.log("Mô hình đã được tải thành công.");
-            } catch (err) {
-                console.error("Không thể tải mô hình: ", err);
-            }
-        }
-
-        async function openCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                camera.srcObject = stream;
-                camera.style.display = 'block';
-                captureButton.style.display = 'inline-block';
-                await loadModels();
-            } catch (err) {
-                alert('Không thể mở camera: ' + err.message);
-            }
-        }
-
-        function capturePhoto() {
-            const ctx = snapshot.getContext('2d');
-            snapshot.width = camera.videoWidth;
-            snapshot.height = camera.videoHeight;
-            ctx.drawImage(camera, 0, 0);
-            snapshot.style.display = 'block';
-            analyzeButton.style.display = 'inline-block';
-        }
-
-        async function analyzeImage() {
-            const fileInput = document.getElementById('imageUpload');
-            if (fileInput.files.length === 0) {
-                alert('Vui lòng chọn một ảnh!');
-                return;
-            }
-            const file = fileInput.files[0];
-            const image = await faceapi.bufferToImage(file);
-            analyzeFace(image);
-        }
-
-        function analyzeCapturedImage() {
-            snapshot.toBlob(async (blob) => {
-                if (blob) {
-                    const image = await faceapi.bufferToImage(blob);
-                    analyzeFace(image);
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+            const openCameraBtn = document.getElementById('openCameraBtn');
+            const fileInput = document.getElementById('fileInput');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const cameraPreview = document.getElementById('cameraPreview');
+            const captureBtn = document.getElementById('captureBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const snapshot = document.getElementById('snapshot');
+            const resultsSection = document.getElementById('resultsSection');
+            const historySection = document.getElementById('historySection');
+            const resultImage = document.getElementById('resultImage');
+            const saveResultBtn = document.getElementById('saveResultBtn');
+            const newAnalysisBtn = document.getElementById('newAnalysisBtn');
+            const historyGrid = document.getElementById('historyGrid');
+            
+            // Variables
+            let stream = null;
+            let currentImageData = null;
+            
+            // Event Listeners
+            uploadPhotoBtn.addEventListener('click', () => fileInput.click());
+            openCameraBtn.addEventListener('click', openCamera);
+            fileInput.addEventListener('change', handleFileUpload);
+            captureBtn.addEventListener('click', capturePhoto);
+            analyzeBtn.addEventListener('click', analyzeImage);
+            saveResultBtn.addEventListener('click', saveResult);
+            newAnalysisBtn.addEventListener('click', resetAnalysis);
+            
+            // Functions
+            function openCamera() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(function(mediaStream) {
+                            stream = mediaStream;
+                            cameraPreview.srcObject = stream;
+                            cameraPreview.style.display = 'block';
+                            previewContainer.style.display = 'block';
+                            captureBtn.style.display = 'block';
+                            analyzeBtn.style.display = 'none';
+                            
+                            // Hide other previews
+                            previewImage.style.display = 'none';
+                        })
+                        .catch(function(err) {
+                            console.error("Error accessing camera: ", err);
+                            alert("Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.");
+                        });
+                } else {
+                    alert("Trình duyệt của bạn không hỗ trợ truy cập camera.");
                 }
-            }, 'image/png');
-        }
-
-        async function analyzeFace(image) {
-            const detections = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
-            if (detections) {
-                console.log('Khuôn mặt được phát hiện:', detections);
-                const landmarks = detections.landmarks;
-                showSuggestions(landmarks);
-            } else {
-                alert('Không phát hiện khuôn mặt nào.');
             }
-        }
-
-        function showSuggestions(landmarks) {
-            let suggestions = '';
-
-            if (landmarks.getMouth().length > 0) {
-                suggestions += 'Cười nhiều hơn để khuôn mặt rạng rỡ hơn!<br>';
+            
+            function capturePhoto() {
+                if (!stream) return;
+                
+                // Set canvas dimensions to match video
+                const video = cameraPreview;
+                snapshot.width = video.videoWidth;
+                snapshot.height = video.videoHeight;
+                
+                // Draw video frame to canvas
+                const ctx = snapshot.getContext('2d');
+                ctx.drawImage(video, 0, 0, snapshot.width, snapshot.height);
+                
+                // Stop camera stream
+                stopCamera();
+                
+                // Show capture button and analyze button
+                captureBtn.style.display = 'none';
+                analyzeBtn.style.display = 'block';
+                
+                // Convert canvas to data URL for preview
+                currentImageData = snapshot.toDataURL('image/png');
+                previewImage.src = currentImageData;
+                previewImage.style.display = 'block';
+                cameraPreview.style.display = 'none';
             }
-            if (landmarks.getLeftEye().length > 0 && landmarks.getRightEye().length > 0) {
-                suggestions += 'Hãy thử nhìn thẳng vào camera để có bức ảnh đẹp hơn!<br>';
+            
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
             }
-
-            suggestionsText.innerHTML = suggestions;
-            suggestionsSection.style.display = 'block';
-
-            storeAnalysisResult(suggestions);
-        }
-
-        function storeAnalysisResult(suggestions) {
-            const history = JSON.parse(localStorage.getItem(historyKey)) || [];
-
-            const newEntry = {
-                timestamp: new Date().toLocaleString(),
-                suggestions: suggestions
-            };
-
-            history.unshift(newEntry);
-            if (history.length > 5) {
-                history.pop(); 
+            
+            function handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                if (!file.type.match('image.*')) {
+                    alert('Vui lòng chọn file ảnh!');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result;
+                    previewImage.src = currentImageData;
+                    previewImage.style.display = 'block';
+                    previewContainer.style.display = 'block';
+                    analyzeBtn.style.display = 'block';
+                    
+                    // Hide camera preview if active
+                    cameraPreview.style.display = 'none';
+                    captureBtn.style.display = 'none';
+                    if (stream) stopCamera();
+                };
+                reader.readAsDataURL(file);
             }
-
-            localStorage.setItem(historyKey, JSON.stringify(history));
-        }
-
-        function viewHistory() {
-            const history = JSON.parse(localStorage.getItem(historyKey)) || [];
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
-
-            if (history.length === 0) {
-                historyList.innerHTML = '<li>Chưa có phân tích nào.</li>';
-            } else {
-                history.forEach(entry => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>${entry.timestamp}</strong>: ${entry.suggestions}`;
-                    historyList.appendChild(listItem);
+            
+            function analyzeImage() {
+                if (!currentImageData) {
+                    alert('Vui lòng tải ảnh lên hoặc chụp ảnh trước khi phân tích!');
+                    return;
+                }
+                
+                // Show loading state
+                analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang phân tích...';
+                analyzeBtn.disabled = true;
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    // Set result image
+                    resultImage.src = currentImageData;
+                    
+                    // Update analysis results with random data (simulation)
+                    updateResults();
+                    
+                    // Show results section
+                    resultsSection.style.display = 'block';
+                    historySection.style.display = 'block';
+                    
+                    // Scroll to results
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Reset analyze button
+                    analyzeBtn.innerHTML = 'Phân tích ngay';
+                    analyzeBtn.disabled = false;
+                    
+                    // Load history
+                    loadHistory();
+                }, 2000);
+            }
+            
+            function updateResults() {
+                // Random scores for demo purposes
+                const overallScore = Math.floor(Math.random() * 30) + 70;
+                const symmetryScore = Math.floor(Math.random() * 30) + 65;
+                const goldenRatioScore = Math.floor(Math.random() * 30) + 60;
+                
+                // Update overall score
+                document.getElementById('overallScore').textContent = 
+                    `Khuôn mặt của bạn đạt ${overallScore}/100 điểm theo tiêu chuẩn sắc đẹp toàn cầu.`;
+                document.getElementById('overallProgress').style.width = `${overallScore}%`;
+                document.getElementById('overallValue').textContent = `${overallScore}%`;
+                
+                // Update symmetry score
+                const symmetryText = symmetryScore > 80 ? "Rất tốt" : 
+                                   symmetryScore > 60 ? "Tốt" : "Có thể cải thiện";
+                document.getElementById('symmetryText').textContent = 
+                    `Độ đối xứng khuôn mặt của bạn ${symmetryText.toLowerCase()}.`;
+                document.getElementById('symmetryProgress').style.width = `${symmetryScore}%`;
+                document.getElementById('symmetryValue').textContent = `${symmetryScore}%`;
+                
+                // Update golden ratio score
+                const goldenRatioText = goldenRatioScore > 85 ? "Gần hoàn hảo" : 
+                                        goldenRatioScore > 70 ? "Khá tốt" : "Có thể cải thiện";
+                document.getElementById('goldenRatioText').textContent = 
+                    `Tỷ lệ vàng trên khuôn mặt bạn ${goldenRatioText.toLowerCase()}.`;
+                document.getElementById('goldenRatioProgress').style.width = `${goldenRatioScore}%`;
+                document.getElementById('goldenRatioValue').textContent = `${goldenRatioScore}%`;
+                
+                // Update suggestions
+                const suggestions = [
+                    "Thử kiểu tóc mới để cân đối tỷ lệ khuôn mặt.",
+                    "Để lộ phần trán nhiều hơn có thể giúp khuôn mặt cân đối.",
+                    "Kiểu trang điểm nhấn mắt có thể làm nổi bật ưu điểm của bạn.",
+                    "Nụ cười rạng rỡ sẽ làm tăng điểm hấp dẫn của bạn."
+                ];
+                const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+                document.getElementById('suggestionsText').textContent = randomSuggestion;
+            }
+            
+            function saveResult() {
+                if (!currentImageData) return;
+                
+                // Get current date
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('vi-VN');
+                
+                // Get analysis text
+                const overallText = document.getElementById('overallScore').textContent;
+                const suggestionsText = document.getElementById('suggestionsText').textContent;
+                
+                // Create history item
+                const historyItem = {
+                    id: Date.now(),
+                    date: dateStr,
+                    image: currentImageData,
+                    analysis: `${overallText} ${suggestionsText}`
+                };
+                
+                // Get existing history or create new array
+                let history = JSON.parse(localStorage.getItem('aiBeautyHistory')) || [];
+                
+                // Add new item to beginning of array
+                history.unshift(historyItem);
+                
+                // Keep only last 5 items
+                if (history.length > 5) {
+                    history = history.slice(0, 5);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('aiBeautyHistory', JSON.stringify(history));
+                
+                // Update history display
+                loadHistory();
+                
+                // Show success message
+                alert('Kết quả đã được lưu vào lịch sử!');
+            }
+            
+            function loadHistory() {
+                // Get history from localStorage
+                const history = JSON.parse(localStorage.getItem('aiBeautyHistory')) || [];
+                
+                // Clear current grid
+                historyGrid.innerHTML = '';
+                
+                // Add each history item to grid
+                history.forEach(item => {
+                    const historyCard = document.createElement('div');
+                    historyCard.className = 'history-card';
+                    historyCard.innerHTML = `
+                        <div class="history-image">
+                            <img src="${item.image}" alt="Lịch sử phân tích">
+                        </div>
+                        <div class="history-content">
+                            <p class="history-date">${item.date}</p>
+                            <p class="history-analysis">${item.analysis}</p>
+                            <a href="#" class="history-view" data-id="${item.id}">Xem chi tiết</a>
+                        </div>
+                    `;
+                    historyGrid.appendChild(historyCard);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.history-view').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const id = parseInt(this.getAttribute('data-id'));
+                        viewHistoryItem(id);
+                    });
                 });
             }
-
-            document.getElementById('historyModal').style.display = 'block';
-        }
-
-        function closeHistory() {
-            document.getElementById('historyModal').style.display = 'none';
-        }
+            
+            function viewHistoryItem(id) {
+                // Get history from localStorage
+                const history = JSON.parse(localStorage.getItem('aiBeautyHistory')) || [];
+                
+                // Find item with matching ID
+                const item = history.find(i => i.id === id);
+                if (!item) return;
+                
+                // Set as current image and show results
+                currentImageData = item.image;
+                resultImage.src = currentImageData;
+                resultsSection.style.display = 'block';
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function resetAnalysis() {
+                // Hide results and history
+                resultsSection.style.display = 'none';
+                historySection.style.display = 'none';
+                
+                // Reset preview
+                previewContainer.style.display = 'none';
+                previewImage.style.display = 'none';
+                previewImage.src = '';
+                cameraPreview.style.display = 'none';
+                if (stream) stopCamera();
+                
+                // Reset file input
+                fileInput.value = '';
+                
+                // Scroll to upload section
+                document.getElementById('upload').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Initialize with empty history
+            loadHistory();
+        });
     </script>
 </body>
 </html>
