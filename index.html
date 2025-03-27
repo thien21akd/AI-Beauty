@@ -818,6 +818,197 @@
                 font-size: 1.8rem;
             }
         }
+        /* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-container {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    position: relative;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.modal-show .modal-container {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.modal-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    color: var(--accent);
+}
+
+.auth-form .form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 2.8rem;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.auth-form input:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.auth-form i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.auth-form input:focus + i {
+    color: var(--accent);
+}
+
+.modal-submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.modal-submit-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.auth-divider {
+    margin: 2rem 0;
+    text-align: center;
+    position: relative;
+}
+
+.auth-divider span {
+    background: white;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #eee;
+}
+
+.social-auth {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.social-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.google-btn:hover {
+    background: #f8f8f8;
+}
+
+.facebook-btn {
+    background: #3b5998;
+    color: white;
+    border-color: #3b5998;
+}
+
+.facebook-btn:hover {
+    background: #2d4373;
+    border-color: #2d4373;
+}
+
+.auth-redirect {
+    text-align: center;
+    color: var(--text-light);
+}
+
+.auth-redirect a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
     </style>
 </head>
 <body>
@@ -832,8 +1023,10 @@
             <a href="#">Lịch sử</a>
             <a href="#">Liên hệ</a>
         </nav>
-        
-        <a href="#" class="nav-cta">Đăng nhập</a>
+<div class="nav-auth">
+    <a href="#" class="nav-cta signup-btn">Đăng ký</a>
+    <a href="#" class="nav-cta login-btn">Đăng nhập</a>
+</div>
     </header>
 
     <!-- Hero Section -->
@@ -1375,5 +1568,53 @@
             loadHistory();
         });
     </script>
+    <!-- Signup Modal -->
+<div class="modal-overlay" id="signupModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Tạo tài khoản mới</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Họ và tên" required>
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Địa chỉ email" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Mật khẩu" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Nhập lại mật khẩu" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="modal-submit-btn">
+                    Đăng ký ngay
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div class="auth-divider">
+                <span>Hoặc đăng ký bằng</span>
+            </div>
+            <div class="social-auth">
+                <button class="social-btn google-btn">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button class="social-btn facebook-btn">
+                    <i class="fab fa-facebook"></i> Facebook
+                </button>
+            </div>
+            <p class="auth-redirect">
+                Đã có tài khoản? <a href="#" class="login-link">Đăng nhập ngay</a>
+            </p>
+        </div>
+    </div>
+</div>
+    
 </body>
 </html>
