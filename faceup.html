@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Face++ Object Detection</title>
+  <title>AI Beauty - Phân tích da mặt</title>
   <style>
     :root {
       --primary-color: #4285f4;
@@ -176,6 +176,19 @@
       font-weight: 600;
     }
     
+    .skin-progress {
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    
+    .skin-progress-bar {
+      height: 100%;
+      background-color: var(--primary-color);
+    }
+    
     .loading {
       display: none;
       text-align: center;
@@ -225,8 +238,8 @@
 <body>
   <div class="container">
     <header>
-      <h1>Face++ Object Detection</h1>
-      <p class="subtitle">Phát hiện và phân tích khuôn mặt, vật thể từ hình ảnh</p>
+      <h1>AI Beauty - Phân tích da mặt</h1>
+      <p class="subtitle">Phát hiện và phân tích tình trạng da mặt từ hình ảnh</p>
     </header>
     
     <section class="upload-section">
@@ -239,7 +252,7 @@
         <img id="imagePreview" alt="Preview">
       </div>
       
-      <button class="detect-button" onclick="detectFace()" disabled>Phát hiện vật thể</button>
+      <button class="detect-button" onclick="analyzeSkin()" disabled>Phân tích da mặt</button>
       
       <div class="loading">
         <div class="spinner"></div>
@@ -251,7 +264,7 @@
     
     <section class="results-section" id="resultsSection">
       <div class="results-header">
-        <h2 class="results-title">Kết quả phân tích</h2>
+        <h2 class="results-title">Kết quả phân tích da</h2>
         <div id="facesCount"></div>
       </div>
       
@@ -262,11 +275,11 @@
   </div>
   
   <footer>
-    <p>Ứng dụng sử dụng Face++ API | © 2023 Object Detection Tool</p>
+    <p>Ứng dụng sử dụng Face++ API | © 2023 AI Beauty Tool</p>
   </footer>
 
   <script>
-    // Preview image when selected
+    // DOM Elements
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewContainer = document.querySelector('.preview-container');
@@ -277,6 +290,7 @@
     const resultsContent = document.getElementById('resultsContent');
     const facesCountElement = document.getElementById('facesCount');
     
+    // Initialize
     imageInput.addEventListener('change', function(e) {
       errorMessageElement.textContent = '';
       
@@ -297,7 +311,8 @@
       }
     });
     
-    async function detectFace() {
+    // Main analysis function
+    async function analyzeSkin() {
       const fileInput = document.getElementById('imageInput');
       const imageFile = fileInput.files[0];
       
@@ -316,7 +331,7 @@
       formData.append('api_key', 'dDx2i-nHse2VVbIBRzWR4AJ4bCigHAA6');
       formData.append('api_secret', '9Exs6Apmafe30QHmRbdCwiw0G9jteRLc');
       formData.append('image_file', imageFile);
-      formData.append('return_attributes', 'age,gender,emotion,ethnicity,beauty,eyestatus,skinstatus');
+      formData.append('return_attributes', 'age,gender,skinstatus');
       
       try {
         const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
@@ -331,7 +346,7 @@
           return;
         }
         
-        displayResults(data);
+        displaySkinResults(data);
       } catch (err) {
         showError('Gặp lỗi khi kết nối đến API: ' + err.message);
         console.error(err);
@@ -341,7 +356,8 @@
       }
     }
     
-    function displayResults(data) {
+    // Display skin analysis results
+    function displaySkinResults(data) {
       resultsContent.innerHTML = '';
       
       if (!data.faces || data.faces.length === 0) {
@@ -361,15 +377,7 @@
         faceTitle.textContent = `Khuôn mặt ${index + 1}`;
         faceCard.appendChild(faceTitle);
         
-        // Face rectangle
-        const faceRectangle = face.face_rectangle;
-        const rectangleDiv = document.createElement('div');
-        rectangleDiv.className = 'attribute';
-        rectangleDiv.innerHTML = `
-        `;
-        faceCard.appendChild(rectangleDiv);
-        
-        // Face attributes
+        // Basic info
         if (face.attributes) {
           const attrs = face.attributes;
           
@@ -377,41 +385,24 @@
           addAttribute(faceCard, 'Giới tính', attrs.gender.value, attrs.gender.confidence);
           addAttribute(faceCard, 'Tuổi', attrs.age.value);
           
-          // Emotion
-          const emotion = attrs.emotion;
-          const highestEmotion = Object.entries(emotion).reduce((a, b) => a[1] > b[1] ? a : b);
-          addAttribute(faceCard, 'Cảm xúc', `${highestEmotion[0]} (${highestEmotion[1]}%)`);
-          
-          // Ethnicity
-          if (attrs.ethnicity) {
-            addAttribute(faceCard, 'Dân tộc', attrs.ethnicity.value, attrs.ethnicity.confidence);
-          }
-          
-          // Beauty
-          if (attrs.beauty) {
-        if (attrs.gender.value.toLowerCase() === 'male') {
-      addAttribute(faceCard, 'Độ đẹp (nam)', `${attrs.beauty.male_score} điểm`);
-    } else if (attrs.gender.value.toLowerCase() === 'female') {
-      addAttribute(faceCard, 'Độ đẹp (nữ)', `${attrs.beauty.female_score} điểm`);
-    }
-  }
-          // Eye status
-          if (attrs.eyestatus) {
-            const leftEye = attrs.eyestatus.left_eye_status;
-            const rightEye = attrs.eyestatus.right_eye_status;
-            
-            const leftEyeStatus = `Bình thường: ${leftEye.normal_glass_eye_open}%, Đeo kính: ${leftEye.normal_glass_eye_close}%`;
-            const rightEyeStatus = `Bình thường: ${rightEye.normal_glass_eye_open}%, Đeo kính: ${rightEye.normal_glass_eye_close}%`;
-            
-            addAttribute(faceCard, 'Trạng thái mắt trái', leftEyeStatus);
-            addAttribute(faceCard, 'Trạng thái mắt phải', rightEyeStatus);
-          }
-          
-          // Skin status
+          // Skin analysis
           if (attrs.skinstatus) {
             const skin = attrs.skinstatus;
-            const skinStatus = `Da dầu: ${skin.oil}%, Khô: ${skin.dark_circle}%, Tàn nhang: ${skin.stain}%, Mụn: ${skin.acne}%, Khỏe: ${skin.health}%`;
-            addAttribute(faceCard, 'Tình trạng da', skinStatus);
+            
+            // Skin health progress bars
+            addSkinAttribute(faceCard, 'Độ dầu da', skin.oil);
+            addSkinAttribute(faceCard, 'Quầng thâm', skin.dark_circle);
+            addSkinAttribute(faceCard, 'Tàn nhang', skin.stain);
+            addSkinAttribute(faceCard, 'Mụn', skin.acne);
+            addSkinAttribute(faceCard, 'Độ khỏe da', skin.health, true);
+            
+            // Skin analysis summary
+            const skinSummary = getSkinSummary(skin);
+            addAttribute(faceCard, 'Đánh giá tổng quan', skinSummary);
+            
+            // Skin care suggestions
+            const suggestions = getSkinCareSuggestions(skin);
+            addAttribute(faceCard, 'Gợi ý chăm sóc da', suggestions);
           }
         }
         
@@ -421,6 +412,25 @@
       resultsSection.style.display = 'block';
     }
     
+    // Helper function to add skin attributes with progress bars
+    function addSkinAttribute(container, label, value, isPositive = false) {
+      const div = document.createElement('div');
+      div.className = 'attribute';
+      
+      // Reverse the value for positive attributes (like skin health)
+      const displayValue = isPositive ? (100 - value) : value;
+      const progressColor = isPositive ? 'var(--secondary-color)' : 'var(--primary-color)';
+      
+      div.innerHTML = `
+        <div class="attribute-label">${label}: <span class="attribute-value">${displayValue}%</span></div>
+        <div class="skin-progress">
+          <div class="skin-progress-bar" style="width: ${displayValue}%; background-color: ${progressColor}"></div>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+    
+    // Helper function to add regular attributes
     function addAttribute(container, label, value, confidence = null) {
       const div = document.createElement('div');
       div.className = 'attribute';
@@ -435,6 +445,51 @@
       html += `</span>`;
       div.innerHTML = html;
       container.appendChild(div);
+    }
+    
+    // Generate skin summary based on analysis
+    function getSkinSummary(skin) {
+      const issues = [];
+      
+      if (skin.oil > 50) issues.push('da dầu');
+      if (skin.dark_circle > 30) issues.push('quầng thâm');
+      if (skin.stain > 20) issues.push('tàn nhang');
+      if (skin.acne > 15) issues.push('mụn');
+      
+      if (issues.length === 0) {
+        return 'Da bạn đang trong tình trạng tốt';
+      }
+      
+      return `Da bạn có dấu hiệu ${issues.join(', ')}`;
+    }
+    
+    // Generate skin care suggestions
+    function getSkinCareSuggestions(skin) {
+      const suggestions = [];
+      
+      if (skin.oil > 50) {
+        suggestions.push('Nên sử dụng sữa rửa mặt kiểm soát dầu');
+      }
+      
+      if (skin.dark_circle > 30) {
+        suggestions.push('Cần ngủ đủ giấc và dùng kem mắt giảm quầng thâm');
+      }
+      
+      if (skin.stain > 20) {
+        suggestions.push('Nên dùng kem chống nắng và sản phẩm giảm thâm nám');
+      }
+      
+      if (skin.acne > 15) {
+        suggestions.push('Cần làm sạch da kỹ và dùng sản phẩm trị mụn');
+      }
+      
+      if (skin.health < 60) {
+        suggestions.push('Nên uống nhiều nước và bổ sung vitamin cho da');
+      }
+      
+      return suggestions.length > 0 
+        ? suggestions.join('. ') + '.' 
+        : 'Tiếp tục chăm sóc da theo routine hiện tại';
     }
     
     function showError(message) {
