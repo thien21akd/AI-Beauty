@@ -5,79 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Beauty - Trợ lý làm đẹp thông minh</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/opencv.js@1.2.1/opencv.js"></script>
   <style>
     :root {
-      --primary-color: #4285f4;
-      --secondary-color: #34a853;
-      --error-color: #ea4335;
-      --background-color: #f8f9fa;
+      --primary-color: #3b82f6;
+      --secondary-color: #10b981;
+      --error-color: #ef4444;
+      --background-color: #f4f7fe;
       --card-color: #ffffff;
-      --text-color: #202124;
-      --border-radius: 8px;
-      --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --text-color: #1f2937;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s ease;
     }
-    
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
       color: var(--text-color);
       background-color: var(--background-color);
-      margin: 0;
       padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    
+
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 20px;
+      flex: 1;
     }
-    
+
     header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
+      animation: fadeIn 1s ease-in;
     }
-    
+
     h1 {
       color: var(--primary-color);
+      font-size: 2.5rem;
+      font-weight: 700;
       margin-bottom: 10px;
     }
-    
+
     .subtitle {
-      color: #5f6368;
-      font-size: 1.1rem;
+      color: #6b7280;
+      font-size: 1.2rem;
+      font-weight: 400;
     }
-    
-    .upload-section {
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tab-button {
+      background-color: var(--card-color);
+      border: none;
+      padding: 12px 24px;
+      margin: 0 10px;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tab-button.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .tab-button:hover {
+      background-color: #2563eb;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .upload-section, .virtual-section {
       background-color: var(--card-color);
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
-      padding: 30px;
-      margin-bottom: 30px;
+      padding: 40px;
+      margin-bottom: 40px;
       text-align: center;
+      transition: var(--transition);
     }
-    
+
+    .upload-section:hover, .virtual-section:hover {
+      transform: translateY(-5px);
+    }
+
     .file-input-wrapper {
       position: relative;
       display: inline-block;
       margin-bottom: 20px;
     }
-    
+
     .file-input-label {
-      display: inline-block;
-      padding: 12px 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
       background-color: var(--primary-color);
       color: white;
       border-radius: var(--border-radius);
       cursor: pointer;
-      transition: background-color 0.3s;
       font-weight: 500;
+      transition: var(--transition);
     }
-    
+
     .file-input-label:hover {
-      background-color: #3367d6;
+      background-color: #2563eb;
+      transform: scale(1.05);
     }
-    
-    #imageInput {
+
+    #imageInput, #webcamToggle {
       position: absolute;
       left: 0;
       top: 0;
@@ -86,291 +148,281 @@
       height: 100%;
       cursor: pointer;
     }
-    
+
     .preview-container {
       margin-top: 20px;
       display: none;
+      animation: fadeIn 0.5s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
     }
-    
-    #imagePreview {
+
+    #imagePreview, #webcamPreview, #virtualImagePreview, #virtualWebcamPreview {
       max-width: 100%;
-      max-height: 300px;
+      max-height: 350px;
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
+      object-fit: cover;
+      display: block;
     }
-    
-    .detect-button {
+
+    .ar-container {
+      display: none;
+      position: relative;
+      margin-top: 20px;
+      height: 400px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+    }
+
+    #arScene, #virtualArScene {
+      width: 100%;
+      height: 100%;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .control-button {
       background-color: var(--secondary-color);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .control-button:hover {
+      background-color: #059669;
+      transform: scale(1.05);
+    }
+
+    .control-button.active {
+      background-color: #047857;
+    }
+
+    .suggestions-box {
+      margin-top: 20px;
+      background-color: #f9fafb;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      text-align: left;
+    }
+
+    .suggestions-box h3 {
+      color: var(--primary-color);
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .detect-button, .ar-button, .webcam-button, .virtual-button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 28px;
       border-radius: var(--border-radius);
       font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s;
       font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      margin: 10px;
     }
-    
-    .detect-button:hover {
-      background-color: #2d9249;
+
+    .detect-button:hover, .ar-button:hover, .webcam-button:hover, .virtual-button:hover {
+      background-color: #059669;
+      transform: scale(1.05);
     }
-    
-    .detect-button:disabled {
-      background-color: #cccccc;
+
+    .detect-button:disabled, .ar-button:disabled, .webcam-button:disabled, .virtual-button:disabled {
+      background-color: #d1d5db;
       cursor: not-allowed;
+      transform: none;
     }
-    
+
     .results-section {
       display: none;
       background-color: var(--card-color);
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
-      padding: 30px;
-      margin-top: 30px;
+      padding: 40px;
+      margin-top: 40px;
+      animation: slideUp 0.5s ease;
     }
-    
+
     .results-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #e5e7eb;
       padding-bottom: 15px;
     }
-    
+
     .results-title {
       color: var(--primary-color);
+      font-size: 1.8rem;
+      font-weight: 600;
       margin: 0;
     }
-    
+
     .results-content {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
     }
-    
+
     .face-card {
-      flex: 1 1 300px;
-      background-color: #f1f3f4;
+      background-color: #f9fafb;
       border-radius: var(--border-radius);
-      padding: 15px;
+      padding: 20px;
       box-shadow: var(--box-shadow);
+      transition: var(--transition);
     }
-    
+
+    .face-card:hover {
+      transform: translateY(-5px);
+    }
+
     .face-card h3 {
       color: var(--primary-color);
+      font-size: 1.4rem;
       margin-top: 0;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #e5e7eb;
       padding-bottom: 10px;
     }
-    
+
     .attribute {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
-    
+
     .attribute-label {
       font-weight: 500;
-      color: #5f6368;
+      color: #4b5563;
     }
-    
+
     .attribute-value {
       font-weight: 600;
+      color: var(--text-color);
     }
-    
+
     .skin-progress {
-      height: 10px;
-      background-color: #e0e0e0;
-      border-radius: 5px;
-      margin-top: 5px;
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      margin-top: 8px;
       overflow: hidden;
     }
-    
+
     .skin-progress-bar {
       height: 100%;
       background-color: var(--primary-color);
+      transition: width 0.5s ease;
     }
-    
+
     .loading {
       display: none;
       text-align: center;
       margin: 20px 0;
     }
-    
+
     .spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
       border-radius: 50%;
       border-top: 4px solid var(--primary-color);
-      width: 30px;
-      height: 30px;
+      width: 36px;
+      height: 36px;
       animation: spin 1s linear infinite;
       margin: 0 auto;
     }
-    
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
+
     .error-message {
       color: var(--error-color);
       text-align: center;
       margin-top: 20px;
       font-weight: 500;
+      animation: shake 0.3s ease;
     }
-    
+
     footer {
       text-align: center;
-      margin-top: 50px;
-      color: #5f6368;
+      margin-top: auto;
+      padding: 20px 0;
+      color: #6b7280;
       font-size: 0.9rem;
     }
-    
-    /* Chatbot Styles */
-    .chatbot-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 350px;
-      background-color: white;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      height: 500px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    
-    .chatbot-header {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 15px;
-      border-top-left-radius: 15px;
-      border-top-right-radius: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-    
-    .chatbot-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-      background-color: #f9f9f9;
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
-    
-    .chatbot-footer {
-      padding: 10px;
-      border-top: 1px solid #eee;
-      display: flex;
-    }
-    
-    #chatbotInput {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      outline: none;
-    }
-    
-    #sendChatbotMessage {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 0 15px;
-      margin-left: 10px;
-      cursor: pointer;
-    }
-    
-    .message {
-      margin-bottom: 15px;
-      max-width: 80%;
-    }
-    
-    .user-message {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 18px 18px 0 18px;
-      margin-left: auto;
-    }
-    
-    .bot-message {
-      background-color: #e5e5ea;
-      color: black;
-      padding: 10px 15px;
-      border-radius: 18px 18px 18px 0;
-      margin-right: auto;
-    }
-    
-    .chatbot-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: var(--primary-color);
-      color: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      z-index: 999;
-    }
-    
-    .typing-indicator {
-      display: inline-block;
-      padding: 10px;
-    }
-    
-    .typing-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #888;
-      margin: 0 2px;
-      animation: typingAnimation 1.4s infinite ease-in-out;
-    }
-    
-    .typing-dot:nth-child(1) {
-      animation-delay: 0s;
-    }
-    
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-    
-    @keyframes typingAnimation {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
-    }
-    
+
     @media (max-width: 768px) {
       .container {
-        padding: 10px;
+        padding: 15px;
       }
-      
-      .upload-section, .results-section {
+
+      .upload-section, .virtual-section, .results-section {
+        padding: 25px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .results-content {
+        grid-template-columns: 1fr;
+      }
+
+      .ar-container {
+        height: 300px;
+      }
+
+      .control-panel {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .file-input-label, .detect-button, .ar-button, .webcam-button, .virtual-button, .control-button {
+        width: 100%;
+        text-align: center;
+      }
+
+      .upload-section, .virtual-section, .results-section {
         padding: 20px;
       }
-      
-      .chatbot-container {
-        width: 90%;
-        right: 5%;
-        height: 60vh;
-      }
-      .chatbot-toggle {
-  display: flex !important; /* Hiển thị nút toggle */
-  background-color: red; /* Màu nổi bật để dễ nhận biết */
-}
     }
   </style>
 </head>
@@ -378,449 +430,622 @@
   <div class="container">
     <header>
       <h1>AI Beauty - Trợ lý làm đẹp thông minh</h1>
-      <p class="subtitle">Phân tích da mặt và tư vấn làm đẹp với AI</p>
+      <p class="subtitle">Phân tích da, thử tóc và trang điểm ảo với AR & AI</p>
     </header>
-    
-    <section class="upload-section">
-      <div class="file-input-wrapper">
-        <label for="imageInput" class="file-input-label">Chọn hình ảnh</label>
-        <input type="file" id="imageInput" accept="image/*">
-      </div>
-      
-      <div class="preview-container">
-        <img id="imagePreview" alt="Preview">
-      </div>
-      
-      <button class="detect-button" onclick="analyzeSkin()" disabled>Phân tích da mặt</button>
-      
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Đang phân tích hình ảnh...</p>
-      </div>
-      
-      <div class="error-message" id="errorMessage"></div>
-    </section>
-    
-    <section class="results-section" id="resultsSection">
-      <div class="results-header">
-        <h2 class="results-title">Kết quả phân tích da</h2>
-        <div id="facesCount"></div>
-      </div>
-      
-      <div class="results-content" id="resultsContent">
-        <!-- Results will be populated here -->
-      </div>
-    </section>
-  </div>
-  
-  <footer>
-    <p>Ứng dụng sử dụng Face++ API và OpenAI API | © 2023 AI Beauty</p>
-  </footer>
 
-  <!-- Chatbot Toggle Button -->
-  <div class="chatbot-toggle" id="chatbotToggle">
-    <i class="fas fa-robot" style="font-size: 24px;"></i>
-  </div>
+    <div class="tabs">
+      <button class="tab-button active" onclick="showTab('skinAnalysis')">Phân tích da</button>
+      <button class="tab-button" onclick="showTab('virtualCustom')">Tùy chỉnh ảo</button>
+    </div>
 
-  <!-- Chatbot Container -->
-  <div class="chatbot-container" id="chatbotContainer">
-    <div class="chatbot-header" id="chatbotHeader">
-      <h3>Trợ lý làm đẹp AI</h3>
-      <i class="fas fa-times" id="closeChatbot"></i>
+    <div id="skinAnalysis" class="tab-content active">
+      <section class="upload-section">
+        <div class="file-input-wrapper">
+          <label for="imageInput" class="file-input-label">
+            <i class="fas fa-upload"></i> Chọn hình ảnh
+          </label>
+          <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="file-input-wrapper">
+          <label for="webcamToggle" class="webcam-button">
+            <i class="fas fa-video"></i> Sử dụng Webcam
+          </label>
+          <input type="checkbox" id="webcamToggle">
+        </div>
+
+        <div class="preview-container">
+          <img id="imagePreview" alt="Ảnh xem trước" style="display: none;">
+          <video id="webcamPreview" autoplay playsinline style="display: none;"></video>
+        </div>
+
+        <div class="ar-container" id="arContainer">
+          <a-scene id="arScene" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+            <a-marker preset="hiro">
+              <a-sphere position="0 0.5 0" radius="0.1" color="red"></a-sphere>
+            </a-marker>
+            <a-camera position="0 0 0"></a-camera>
+          </a-scene>
+        </div>
+
+        <button class="detect-button" onclick="analyzeSkin()" disabled>Phân tích da mặt</button>
+        <button class="ar-button" onclick="toggleARView()" disabled>Chế độ AR</button>
+
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Đang phân tích hình ảnh...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+      </section>
+
+      <section class="results-section" id="resultsSection">
+        <div class="results-header">
+          <h2 class="results-title">Kết quả phân tích da</h2>
+          <div id="facesCount"></div>
+        </div>
+
+        <div class="results-content" id="resultsContent">
+          <!-- Results will be populated here -->
+        </div>
+      </section>
     </div>
-    <div class="chatbot-body" id="chatbotBody">
-      <!-- Messages will appear here -->
+
+    <div id="virtualCustom" class="tab-content">
+      <section class="virtual-section">
+        <div class="preview-container">
+          <img id="virtualImagePreview" alt="Ảnh xem trước" style="display: none;">
+          <video id="virtualWebcamPreview" autoplay playsinline style="display: none;"></video>
+        </div>
+
+        <div class="ar-container" id="virtualArContainer">
+          <a-scene id="virtualArScene" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+            <a-marker preset="hiro">
+              <a-box position="0 0.5 0" scale="0.5 0.2 0.1" color="black"></a-box>
+            </a-marker>
+            <a-camera position="0 0 0"></a-camera>
+          </a-scene>
+        </div>
+
+        <div class="control-panel">
+          <button class="control-button" onclick="applyVirtualStyle('hair', 'short')">Tóc ngắn</button>
+          <button class="control-button" onclick="applyVirtualStyle('hair', 'long')">Tóc dài</button>
+          <button class="control-button" onclick="applyVirtualStyle('hair', 'curly')">Tóc xoăn</button>
+          <button class="control-button" onclick="applyVirtualStyle('hairColor', 'black')">Màu đen</button>
+          <button class="control-button" onclick="applyVirtualStyle('hairColor', 'brown')">Màu nâu</button>
+          <button class="control-button" onclick="applyVirtualStyle('hairColor', 'blonde')">Màu vàng</button>
+          <button class="control-button" onclick="applyVirtualStyle('makeup', 'redLip')">Son đỏ</button>
+          <button class="control-button" onclick="applyVirtualStyle('makeup', 'pinkLip')">Son hồng</button>
+          <button class="control-button" onclick="applyVirtualStyle('makeup', 'blueEyeshadow')">Phấn mắt xanh</button>
+        </div>
+
+        <button class="virtual-button" onclick="startVirtualMode()">Bật chế độ ảo</button>
+
+        <div class="suggestions-box" id="virtualSuggestions">
+          <h3>Gợi ý làm đẹp</h3>
+          <p>Chọn một kiểu tóc hoặc trang điểm để nhận gợi ý!</p>
+        </div>
+
+        <div class="error-message" id="virtualErrorMessage"></div>
+      </section>
     </div>
-    <div class="chatbot-footer">
-      <input type="text" id="chatbotInput" placeholder="Nhập câu hỏi về làm đẹp...">
-      <button id="sendChatbotMessage"><i class="fas fa-paper-plane"></i></button>
-    </div>
+
+    <footer>
+      <p>Ứng dụng sử dụng Face++ API, AR.js & OpenCV.js | © 2023 AI Beauty</p>
+    </footer>
   </div>
 
   <script>
     // DOM Elements
-    // DOM Elements
-const imageInput = document.getElementById('imageInput');
-const imagePreview = document.getElementById('imagePreview');
-const previewContainer = document.querySelector('.preview-container');
-const detectButton = document.querySelector('.detect-button');
-const loadingElement = document.querySelector('.loading');
-const errorMessageElement = document.getElementById('errorMessage');
-const resultsSection = document.getElementById('resultsSection');
-const resultsContent = document.getElementById('resultsContent');
-const facesCountElement = document.getElementById('facesCount');
+    const imageInput = document.getElementById('imageInput');
+    const webcamToggle = document.getElementById('webcamToggle');
+    const imagePreview = document.getElementById('imagePreview');
+    const webcamPreview = document.getElementById('webcamPreview');
+    const virtualImagePreview = document.getElementById('virtualImagePreview');
+    const virtualWebcamPreview = document.getElementById('virtualWebcamPreview');
+    const previewContainer = document.querySelector('#skinAnalysis .preview-container');
+    const arContainer = document.getElementById('arContainer');
+    const virtualArContainer = document.getElementById('virtualArContainer');
+    const detectButton = document.querySelector('.detect-button');
+    const arButton = document.querySelector('.ar-button');
+    const virtualButton = document.querySelector('.virtual-button');
+    const loadingElement = document.querySelector('.loading');
+    const errorMessageElement = document.getElementById('errorMessage');
+    const virtualErrorMessageElement = document.getElementById('virtualErrorMessage');
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsContent = document.getElementById('resultsContent');
+    const facesCountElement = document.getElementById('facesCount');
+    const virtualSuggestions = document.getElementById('virtualSuggestions');
+    let stream = null;
+    let faceData = null;
+    let virtualStream = null;
+    let currentHair = null;
+    let currentHairColor = 'black';
+    let currentMakeup = null;
 
-// Chatbot Elements
-const chatbotToggle = document.getElementById('chatbotToggle');
-const chatbotContainer = document.getElementById('chatbotContainer');
-const chatbotHeader = document.getElementById('chatbotHeader');
-const chatbotBody = document.getElementById('chatbotBody');
-const chatbotInput = document.getElementById('chatbotInput');
-const sendChatbotMessage = document.getElementById('sendChatbotMessage');
-const closeChatbot = document.getElementById('closeChatbot');
-
-// Initialize
-imageInput.addEventListener('change', function(e) {
-  errorMessageElement.textContent = '';
-  
-  if (e.target.files.length > 0) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = function(event) {
-      imagePreview.src = event.target.result;
-      previewContainer.style.display = 'block';
-      detectButton.disabled = false;
-    };
-    
-    reader.readAsDataURL(file);
-  } else {
-    previewContainer.style.display = 'none';
-    detectButton.disabled = true;
-  }
-});
-
-// Skin Analysis Function
-async function analyzeSkin() {
-  const fileInput = document.getElementById('imageInput');
-  const imageFile = fileInput.files[0];
-  
-  if (!imageFile) {
-    showError('Vui lòng chọn ảnh trước khi phân tích');
-    return;
-  }
-  
-  // Show loading state
-  loadingElement.style.display = 'block';
-  detectButton.disabled = true;
-  resultsSection.style.display = 'none';
-  errorMessageElement.textContent = '';
-  
-  const formData = new FormData();
-  formData.append('api_key', 'dDx2i-nHse2VVbIBRzWR4AJ4bCigHAA6');
-  formData.append('api_secret', '9Exs6Apmafe30QHmRbdCwiw0G9jteRLc');
-  formData.append('image_file', imageFile);
-  formData.append('return_attributes', 'age,gender,skinstatus');
-  
-  try {
-    const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
-      method: 'POST',
-      body: formData
-    });
-    
-    const data = await response.json();
-    
-    if (data.error_message) {
-      showError(`Lỗi API: ${data.error_message}`);
-      return;
+    // Check HTTPS
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      showError('Webcam yêu cầu HTTPS. Vui lòng chạy trên HTTPS hoặc localhost.');
+      webcamToggle.disabled = true;
+      virtualButton.disabled = true;
     }
-    
-    displaySkinResults(data);
-    
-    // Auto-generate a consultation request based on skin analysis
-    if (data.faces && data.faces.length > 0 && data.faces[0].attributes?.skinstatus) {
-      const skin = data.faces[0].attributes.skinstatus;
-      const concerns = [];
-      
-      if (skin.oil > 50) concerns.push('da dầu');
-      if (skin.dark_circle > 30) concerns.push('quầng thâm');
-      if (skin.stain > 20) concerns.push('tàn nhang');
-      if (skin.acne > 15) concerns.push('mụn');
-      
-      if (concerns.length > 0) {
-        setTimeout(() => {
-          sendToChatbot(`Tôi có làn da ${concerns.join(', ')}. Bạn có thể tư vấn giúp tôi không?`);
-        }, 1500);
+
+    // Tab Switching
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+      if (tabId === 'virtualCustom') {
+        stopWebcam();
+        startVirtualMode();
+      } else {
+        stopVirtualWebcam();
       }
     }
-  } catch (err) {
-    showError('Gặp lỗi khi kết nối đến API: ' + err.message);
-    console.error(err);
-  } finally {
-    loadingElement.style.display = 'none';
-    detectButton.disabled = false;
-  }
-}
 
-// Display Skin Results
-function displaySkinResults(data) {
-  resultsContent.innerHTML = '';
-  
-  if (!data.faces || data.faces.length === 0) {
-    showError('Không phát hiện khuôn mặt nào trong ảnh');
-    return;
-  }
-  
-  // Update faces count
-  facesCountElement.textContent = `Đã phát hiện: ${data.faces.length} khuôn mặt`;
-  
-  // Process each face
-  data.faces.forEach((face, index) => {
-    const faceCard = document.createElement('div');
-    faceCard.className = 'face-card';
-    
-    const faceTitle = document.createElement('h3');
-    faceTitle.textContent = `Khuôn mặt ${index + 1}`;
-    faceCard.appendChild(faceTitle);
-    
-    // Basic info
-    if (face.attributes) {
-      const attrs = face.attributes;
-      
-      // Gender and age
-      addAttribute(faceCard, 'Giới tính', attrs.gender.value, attrs.gender.confidence);
-      addAttribute(faceCard, 'Tuổi', attrs.age.value);
-      
-      // Skin analysis
-      if (attrs.skinstatus) {
-        const skin = attrs.skinstatus;
-        
-        // Skin health progress bars
-        addSkinAttribute(faceCard, 'Độ dầu da', skin.oil);
-        addSkinAttribute(faceCard, 'Quầng thâm', skin.dark_circle);
-        addSkinAttribute(faceCard, 'Tàn nhang', skin.stain);
-        addSkinAttribute(faceCard, 'Mụn', skin.acne);
-        addSkinAttribute(faceCard, 'Độ khỏe da', skin.health, true);
-        
-        // Skin analysis summary
-        const skinSummary = getSkinSummary(skin);
-        addAttribute(faceCard, 'Đánh giá tổng quan', skinSummary);
-        
-        // Skin care suggestions
-        const suggestions = getSkinCareSuggestions(skin);
-        addAttribute(faceCard, 'Gợi ý chăm sóc da', suggestions);
+    // Skin Analysis: Initialize
+    imageInput.addEventListener('change', function (e) {
+      stopWebcam();
+      errorMessageElement.textContent = '';
+
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          imagePreview.src = event.target.result;
+          virtualImagePreview.src = event.target.result;
+          imagePreview.style.display = 'block';
+          webcamPreview.style.display = 'none';
+          previewContainer.style.display = 'flex';
+          arContainer.style.display = 'none';
+          detectButton.disabled = false;
+          arButton.disabled = true;
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.style.display = 'none';
+        arContainer.style.display = 'none';
+        detectButton.disabled = true;
+        arButton.disabled = true;
+      }
+    });
+
+    webcamToggle.addEventListener('change', async function () {
+      if (webcamToggle.checked) {
+        try {
+          imageInput.value = '';
+          imagePreview.style.display = 'none';
+          webcamPreview.style.display = 'block';
+          previewContainer.style.display = 'flex';
+          arContainer.style.display = 'none';
+          detectButton.disabled = false;
+          arButton.disabled = true;
+
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          webcamPreview.srcObject = stream;
+          webcamPreview.play();
+
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          webcamPreview.addEventListener('loadedmetadata', () => {
+            canvas.width = webcamPreview.videoWidth;
+            canvas.height = webcamPreview.videoHeight;
+          });
+
+          setInterval(() => {
+            if (webcamToggle.checked) {
+              ctx.drawImage(webcamPreview, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob(blob => {
+                if (blob) {
+                  analyzeSkin(blob);
+                }
+              }, 'image/jpeg');
+            }
+          }, 10000);
+        } catch (err) {
+          showError(`Không thể truy cập webcam: ${err.message}. Vui lòng kiểm tra quyền hoặc thiết bị.`);
+          webcamToggle.checked = false;
+          webcamToggle.disabled = true;
+        }
+      } else {
+        stopWebcam();
+        webcamPreview.style.display = 'none';
+        previewContainer.style.display = 'none';
+        arContainer.style.display = 'none';
+        detectButton.disabled = true;
+        arButton.disabled = true;
+      }
+    });
+
+    function stopWebcam() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        webcamPreview.srcObject = null;
       }
     }
-    
-    resultsContent.appendChild(faceCard);
-  });
-  
-  resultsSection.style.display = 'block';
-}
 
-// Helper function to add skin attributes with progress bars
-function addSkinAttribute(container, label, value, isPositive = false) {
-  const div = document.createElement('div');
-  div.className = 'attribute';
-  
-  // Reverse the value for positive attributes (like skin health)
-  const displayValue = isPositive ? value : value;
-  const progressColor = isPositive ? 'var(--secondary-color)' : 'var(--primary-color)';
-  
-  div.innerHTML = `
-    <div class="attribute-label">${label}: <span class="attribute-value">${displayValue}%</span></div>
-    <div class="skin-progress">
-      <div class="skin-progress-bar" style="width: ${displayValue}%; background-color: ${progressColor}"></div>
-    </div>
-  `;
-  container.appendChild(div);
-}
+    // Virtual Custom Mode
+    async function startVirtualMode() {
+      virtualErrorMessageElement.textContent = '';
+      virtualButton.disabled = true;
 
-// Helper function to add regular attributes
-function addAttribute(container, label, value, confidence = null) {
-  const div = document.createElement('div');
-  div.className = 'attribute';
-  
-  let html = `<span class="attribute-label">${label}: </span>
-              <span class="attribute-value">${value}`;
-  
-  if (confidence !== null) {
-    html += ` <small>(${Math.round(confidence)}% chính xác)</small>`;
-  }
-  
-  html += `</span>`;
-  div.innerHTML = html;
-  container.appendChild(div);
-}
-
-// Generate skin summary based on analysis
-function getSkinSummary(skin) {
-  const issues = [];
-  
-  if (skin.oil > 50) issues.push('da dầu');
-  if (skin.dark_circle > 30) issues.push('quầng thâm');
-  if (skin.stain > 20) issues.push('tàn nhang');
-  if (skin.acne > 15) issues.push('mụn');
-  
-  if (issues.length === 0) {
-    return 'Da bạn đang trong tình trạng tốt';
-  }
-  
-  return `Da bạn có dấu hiệu ${issues.join(', ')}`;
-}
-
-// Generate skin care suggestions
-function getSkinCareSuggestions(skin) {
-  const suggestions = [];
-  
-  if (skin.oil > 50) {
-    suggestions.push('Nên sử dụng sữa rửa mặt kiểm soát dầu');
-  }
-  
-  if (skin.dark_circle > 30) {
-    suggestions.push('Cần ngủ đủ giấc và dùng kem mắt giảm quầng thâm');
-  }
-  
-  if (skin.stain > 20) {
-    suggestions.push('Nên dùng kem chống nắng và sản phẩm giảm thâm nám');
-  }
-  
-  if (skin.acne > 15) {
-    suggestions.push('Cần làm sạch da kỹ và dùng sản phẩm trị mụn');
-  }
-  
-  if (skin.health < 60) {
-    suggestions.push('Nên uống nhiều nước và bổ sung vitamin cho da');
-  }
-  
-  return suggestions.length > 0 
-    ? suggestions.join('. ') + '.' 
-    : 'Tiếp tục chăm sóc da theo routine hiện tại';
-}
-
-function showError(message) {
-  errorMessageElement.textContent = message;
-  resultsSection.style.display = 'none';
-}
-
-// Chatbot Functions
-chatbotToggle.addEventListener('click', () => {
-  chatbotContainer.style.display = 'flex';
-  chatbotToggle.style.display = 'none';
-});
-
-closeChatbot.addEventListener('click', () => {
-  chatbotContainer.style.display = 'none';
-  chatbotToggle.style.display = 'flex';
-});
-
-chatbotHeader.addEventListener('click', () => {
-  if (chatbotContainer.style.height === '60px') {
-    chatbotContainer.style.height = '500px';
-  } else {
-    chatbotContainer.style.height = '60px';
-  }
-});
-
-// Send message when Enter is pressed
-chatbotInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    sendMessage();
-  }
-});
-
-sendChatbotMessage.addEventListener('click', sendMessage);
-
-function sendMessage() {
-  const message = chatbotInput.value.trim();
-  if (message === '') return;
-  
-  addMessage(message, 'user');
-  chatbotInput.value = '';
-  
-  // Show typing indicator
-  const typingIndicator = document.createElement('div');
-  typingIndicator.className = 'message bot-message typing-indicator';
-  typingIndicator.innerHTML = `
-    <span class="typing-dot"></span>
-    <span class="typing-dot"></span>
-    <span class="typing-dot"></span>
-  `;
-  chatbotBody.appendChild(typingIndicator);
-  chatbotBody.scrollTop = chatbotBody.scrollHeight;
-  
-  // Get AI response
-  getAIResponse(message)
-    .then(response => {
-      chatbotBody.removeChild(typingIndicator);
-      addMessage(response, 'bot');
-    })
-    .catch(error => {
-      chatbotBody.removeChild(typingIndicator);
-      addMessage('Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu của bạn.', 'bot');
-      console.error('Chatbot error:', error);
-    });
-}
-
-function addMessage(text, sender) {
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${sender}-message`;
-  messageDiv.textContent = text;
-  chatbotBody.appendChild(messageDiv);
-  chatbotBody.scrollTop = chatbotBody.scrollHeight;
-}
-
-function sendToChatbot(text) {
-  chatbotContainer.style.display = 'flex';
-  chatbotToggle.style.display = 'none';
-  addMessage(text, 'user');
-  
-  // Show typing indicator
-  const typingIndicator = document.createElement('div');
-  typingIndicator.className = 'message bot-message typing-indicator';
-  typingIndicator.innerHTML = `
-    <span class="typing-dot"></span>
-    <span class="typing-dot"></span>
-    <span class="typing-dot"></span>
-  `;
-  chatbotBody.appendChild(typingIndicator);
-  chatbotBody.scrollTop = chatbotBody.scrollHeight;
-  
-  // Get AI response
-  getAIResponse(text)
-    .then(response => {
-      chatbotBody.removeChild(typingIndicator);
-      addMessage(response, 'bot');
-    })
-    .catch(error => {
-      chatbotBody.removeChild(typingIndicator);
-      addMessage('Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu của bạn.', 'bot');
-    });
-}
-
-// Thay đổi phần khởi tạo chatbot
-window.addEventListener('load', () => {
-  // Hiển thị chatbot toggle ngay từ đầu
-  chatbotToggle.style.display = 'flex';
-  
-  // Thêm lời chào ban đầu
-  setTimeout(() => {
-    addMessage("Xin chào! Tôi là trợ lý làm đẹp AI. Tôi có thể giúp gì cho bạn về chăm sóc da và làm đẹp?", 'bot');
-  }, 1000);
-});
-
-// Sửa hàm getAIResponse
-async function getAIResponse(message) {
-  const OPENAI_API_KEY = "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";  
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "Bạn là chuyên gia AI. Hãy trả lời ngắn gọn và rõ ràng." },
-          { role: "user", content: message }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Lỗi API: ${response.statusText}`);
+      try {
+        if (!virtualStream) {
+          virtualStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          virtualWebcamPreview.srcObject = virtualStream;
+          virtualWebcamPreview.play();
+          virtualImagePreview.style.display = 'none';
+          virtualWebcamPreview.style.display = 'block';
+          document.querySelector('#virtualCustom .preview-container').style.display = 'flex';
+          virtualArContainer.style.display = 'block';
+        }
+        virtualButton.disabled = false;
+        applyVirtualStyle(null, null);
+      } catch (err) {
+        showVirtualError(`Không thể truy cập webcam: ${err.message}. Vui lòng kiểm tra quyền hoặc thiết bị.`);
+        virtualButton.disabled = true;
+      }
     }
 
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error("Lỗi kết nối OpenAI:", error);
-    return "Xin lỗi, tôi gặp lỗi khi kết nối AI. Vui lòng thử lại!";
-  }
-}
+    function stopVirtualWebcam() {
+      if (virtualStream) {
+        virtualStream.getTracks().forEach(track => track.stop());
+        virtualStream = null;
+        virtualWebcamPreview.srcObject = null;
+      }
+      virtualWebcamPreview.style.display = 'none';
+      virtualArContainer.style.display = 'none';
+      document.querySelector('#virtualCustom .preview-container').style.display = 'none';
+    }
+
+    function applyVirtualStyle(type, value) {
+      if (type === 'hair') currentHair = value;
+      if (type === 'hairColor') currentHairColor = value;
+      if (type === 'makeup') currentMakeup = value;
+
+      document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+      if (type && value) {
+        document.querySelector(`.control-button[onclick="applyVirtualStyle('${type}', '${value}')"]`).classList.add('active');
+      }
+
+      const scene = document.getElementById('virtualArScene');
+      while (scene.firstChild) {
+        scene.removeChild(scene.firstChild);
+      }
+
+      const marker = document.createElement('a-marker');
+      marker.setAttribute('preset', 'hiro');
+
+      if (currentHair) {
+        const hair = document.createElement('a-box');
+        hair.setAttribute('position', '0 0.5 0');
+        hair.setAttribute('scale', currentHair === 'short' ? '0.5 0.2 0.1' : currentHair === 'long' ? '0.5 0.4 0.1' : '0.5 0.3 0.2');
+        hair.setAttribute('color', currentHairColor);
+        marker.appendChild(hair);
+      }
+
+      if (currentMakeup) {
+        const makeup = document.createElement('a-plane');
+        makeup.setAttribute('position', '0 0 0.1');
+        makeup.setAttribute('scale', '0.2 0.1 0.1');
+        makeup.setAttribute('color', currentMakeup === 'redLip' ? 'red' : currentMakeup === 'pinkLip' ? 'pink' : 'blue');
+        marker.appendChild(makeup);
+      }
+
+      const camera = document.createElement('a-camera');
+      camera.setAttribute('position', '0 0 0');
+
+      scene.appendChild(marker);
+      scene.appendChild(camera);
+
+      updateVirtualSuggestions();
+    }
+
+    function updateVirtualSuggestions() {
+      let suggestions = 'Hãy chọn một kiểu tóc hoặc trang điểm để nhận gợi ý!';
+      if (faceData && faceData.faces && faceData.faces.length > 0) {
+        const skin = faceData.faces[0].attributes.skinstatus;
+        const beauty = faceData.faces[0].attributes.beauty;
+        const beautyScore = faceData.faces[0].attributes.gender.value === 'Male' ? beauty.male_beauty : beauty.female_beauty;
+        suggestions = `<p><strong>Kiểu tóc:</strong> ${currentHair || 'Chưa chọn'}</p>
+                       <p><strong>Màu tóc:</strong> ${currentHairColor}</p>
+                       <p><strong>Trang điểm:</strong> ${currentMakeup || 'Chưa chọn'}</p>
+                       <p><strong>Độ đẹp:</strong> ${Math.round(beautyScore)}%</p>`;
+
+        if (currentHair === 'short' && skin.oil > 50) {
+          suggestions += '<p>Tóc ngắn giúp giảm cảm giác nặng nề cho da dầu. Kết hợp với son hồng nhẹ để làm sáng da.</p>';
+        } else if (currentHair === 'long' && skin.dark_circle > 30) {
+          suggestions += '<p>Tóc dài che bớt quầng thâm, kết hợp phấn mắt xanh để tạo điểm nhấn.</p>';
+        } else if (currentHair === 'curly' && skin.acne > 15) {
+          suggestions += '<p>Tóc xoăn tạo phong cách nổi bật, dùng son đỏ để thu hút sự chú ý khỏi mụn.</p>';
+        }
+
+        if (currentMakeup === 'redLip') {
+          suggestions += '<p>Son đỏ làm nổi bật làn da, phù hợp với mọi kiểu tóc.</p>';
+        } else if (currentMakeup === 'pinkLip' && skin.health > 60) {
+          suggestions += '<p>Son hồng tôn lên làn da khỏe mạnh, thử tóc ngắn để thêm năng động.</p>';
+        } else if (currentMakeup === 'blueEyeshadow') {
+          suggestions += '<p>Phấn mắt xanh tạo điểm nhấn, kết hợp tóc dài để tăng sự quyến rũ.</p>';
+        }
+
+        if (beautyScore > 80) {
+          suggestions += '<p>Khuôn mặt bạn rất cân đối và thu hút! Hãy thử các kiểu tóc và trang điểm táo bạo để nổi bật hơn.</p>';
+        } else if (beautyScore > 60) {
+          suggestions += '<p>Khuôn mặt bạn có nét đẹp tự nhiên. Kết hợp tóc và trang điểm nhẹ nhàng để tôn lên vẻ đẹp.</p>';
+        } else {
+          suggestions += '<p>Hãy thử các kiểu tóc và trang điểm để tìm phong cách phù hợp nhất với bạn!</p>';
+        }
+      }
+
+      virtualSuggestions.innerHTML = `<h3>Gợi ý làm đẹp</h3>${suggestions}`;
+    }
+
+    // Computer Vision with OpenCV.js
+    async function preprocessImage(imageFile) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          let src = cv.imread(canvas);
+          let gray = new cv.Mat();
+          cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+          let edges = new cv.Mat();
+          cv.Canny(gray, edges, 50, 150);
+
+          let textureScore = 0;
+          for (let i = 0; i < edges.data.length; i++) {
+            textureScore += edges.data[i];
+          }
+          textureScore = Math.min(100, Math.round(textureScore / 10000));
+
+          src.delete();
+          gray.delete();
+          edges.delete();
+
+          resolve({ textureScore });
+        };
+        img.src = URL.createObjectURL(imageFile);
+      });
+    }
+
+    // Skin Analysis Function
+    async function analyzeSkin(imageFile) {
+      if (!imageFile && !imageInput.files[0]) {
+        showError('Vui lòng chọn ảnh hoặc bật webcam trước khi phân tích');
+        return;
+      }
+
+      const file = imageFile || imageInput.files[0];
+
+      loadingElement.style.display = 'block';
+      detectButton.disabled = true;
+      resultsSection.style.display = 'none';
+      errorMessageElement.textContent = '';
+
+      const cvResults = await preprocessImage(file);
+
+      const formData = new FormData();
+      formData.append('api_key', 'dDx2i-nHse2VVbIBRzWR4AJ4bCigHAA6');
+      formData.append('api_secret', '9Exs6Apmafe30QHmRbdCwiw0G9jteRLc');
+      formData.append('image_file', file);
+      formData.append('return_attributes', 'age,gender,skinstatus,facequality,beauty');
+
+      try {
+        const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.error_message) {
+          showError(`Lỗi API: ${data.error_message}`);
+          return;
+        }
+
+        faceData = data;
+        displaySkinResults(data, cvResults);
+        arButton.disabled = false;
+        updateVirtualSuggestions();
+      } catch (err) {
+        showError('Gặp lỗi khi kết nối đến API: ' + err.message);
+        console.error(err);
+      } finally {
+        loadingElement.style.display = 'none';
+        detectButton.disabled = false;
+      }
+    }
+
+    // Toggle AR View (Skin Analysis)
+    function toggleARView() {
+      if (!faceData || !faceData.faces || faceData.faces.length === 0) {
+        showError('Không có dữ liệu khuôn mặt để hiển thị AR');
+        return;
+      }
+
+      previewContainer.style.display = 'none';
+      arContainer.style.display = 'block';
+
+      const scene = document.getElementById('arScene');
+      while (scene.firstChild) {
+        scene.removeChild(scene.firstChild);
+      }
+
+      const marker = document.createElement('a-marker');
+      marker.setAttribute('preset', 'hiro');
+
+      faceData.faces.forEach(face => {
+        const attributes = face.attributes.skinstatus;
+        if (attributes.acne > 15) {
+          const sphere = document.createElement('a-sphere');
+          sphere.setAttribute('position', '0 0.5 0');
+          sphere.setAttribute('radius', '0.1');
+          sphere.setAttribute('color', 'red');
+          marker.appendChild(sphere);
+        }
+        if (attributes.dark_circle > 30) {
+          const sphere = document.createElement('a-sphere');
+          sphere.setAttribute('position', '0.2 0.5 0');
+          sphere.setAttribute('radius', '0.1');
+          sphere.setAttribute('color', 'blue');
+          marker.appendChild(sphere);
+        }
+      });
+
+      const camera = document.createElement('a-camera');
+      camera.setAttribute('position', '0 0 0');
+
+      scene.appendChild(marker);
+      scene.appendChild(camera);
+    }
+
+    // Display Skin Results
+    function displaySkinResults(data, cvResults) {
+      resultsContent.innerHTML = '';
+
+      if (!data.faces || data.faces.length === 0) {
+        showError('Không phát hiện khuôn mặt nào trong ảnh');
+        return;
+      }
+
+      facesCountElement.textContent = `Đã phát hiện: ${data.faces.length} khuôn mặt`;
+
+      data.faces.forEach((face, index) => {
+        const faceCard = document.createElement('div');
+        faceCard.className = 'face-card';
+
+        const faceTitle = document.createElement('h3');
+        faceTitle.textContent = `Khuôn mặt ${index + 1}`;
+        faceCard.appendChild(faceTitle);
+
+        if (face.attributes) {
+          const attrs = face.attributes;
+
+          addAttribute(faceCard, 'Giới tính', attrs.gender.value, attrs.gender.confidence);
+          addAttribute(faceCard, 'Tuổi', attrs.age.value);
+          addSkinAttribute(faceCard, 'Độ mịn da (CV)', cvResults.textureScore);
+
+          if (attrs.beauty) {
+            const beautyScore = attrs.gender.value === 'Male' ? attrs.beauty.male_beauty : attrs.beauty.female_beauty;
+            addSkinAttribute(faceCard, 'Độ đẹp', Math.round(beautyScore), true);
+          }
+
+          if (attrs.skinstatus) {
+            const skin = attrs.skinstatus;
+            addSkinAttribute(faceCard, 'Độ dầu da', skin.oil);
+            addSkinAttribute(faceCard, 'Quầng thâm', skin.dark_circle);
+            addSkinAttribute(faceCard, 'Tàn nhang', skin.stain);
+            addSkinAttribute(faceCard, 'Mụn', skin.acne);
+            addSkinAttribute(faceCard, 'Độ khỏe da', skin.health, true);
+
+            const skinSummary = getSkinSummary(skin);
+            addAttribute(faceCard, 'Đánh giá tổng quan', skinSummary);
+
+            const suggestions = getSkinCareSuggestions(skin);
+            addAttribute(faceCard, 'Gợi ý chăm sóc da', suggestions);
+          }
+        }
+
+        resultsContent.appendChild(faceCard);
+      });
+
+      resultsSection.style.display = 'block';
+    }
+
+    function addSkinAttribute(container, label, value, isPositive = false) {
+      const div = document.createElement('div');
+      div.className = 'attribute';
+
+      const displayValue = isPositive ? value : value;
+      const progressColor = isPositive ? 'var(--secondary-color)' : 'var(--primary-color)';
+
+      div.innerHTML = `
+        <div class="attribute-label">${label}: <span class="attribute-value">${displayValue}%</span></div>
+        <div class="skin-progress">
+          <div class="skin-progress-bar" style="width: ${displayValue}%; background-color: ${progressColor}"></div>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function addAttribute(container, label, value, confidence = null) {
+      const div = document.createElement('div');
+      div.className = 'attribute';
+
+      let html = `<span class="attribute-label">${label}: </span>
+                  <span class="attribute-value">${value}`;
+
+      if (confidence !== null) {
+        html += ` <small>(${Math.round(confidence)}% chính xác)</small>`;
+      }
+
+      html += `</span>`;
+      div.innerHTML = html;
+      container.appendChild(div);
+    }
+
+    function getSkinSummary(skin) {
+      const issues = [];
+
+      if (skin.oil > 50) issues.push('da dầu');
+      if (skin.dark_circle > 30) issues.push('quầng thâm');
+      if (skin.stain > 20) issues.push('tàn nhang');
+      if (skin.acne > 15) issues.push('mụn');
+
+      if (issues.length === 0) {
+        return 'Da bạn đang trong tình trạng tốt';
+      }
+
+      return `Da bạn có dấu hiệu ${issues.join(', ')}`;
+    }
+
+    function getSkinCareSuggestions(skin) {
+      const suggestions = [];
+
+      if (skin.oil > 50) {
+        suggestions.push('Sử dụng sữa rửa mặt kiểm soát dầu và toner cân bằng độ ẩm');
+      }
+
+      if (skin.dark_circle > 30) {
+        suggestions.push('Ngủ đủ giấc, sử dụng kem mắt chứa vitamin C hoặc retinol');
+      }
+
+      if (skin.stain > 20) {
+        suggestions.push('Dùng kem chống nắng SPF 30+ và sản phẩm chứa niacinamide');
+      }
+
+      if (skin.acne > 15) {
+        suggestions.push('Làm sạch da kỹ, sử dụng sản phẩm chứa salicylic acid hoặc benzoyl peroxide');
+      }
+
+      if (skin.health < 60) {
+        suggestions.push('Uống đủ nước, bổ sung thực phẩm giàu vitamin A, C, E');
+      }
+
+      return suggestions.length > 0
+        ? suggestions.join('. ') + '.'
+        : 'Tiếp tục duy trì thói quen chăm sóc da hiện tại';
+    }
+
+    function showError(message) {
+      errorMessageElement.textContent = message;
+      resultsSection.style.display = 'none';
+    }
+
+    function showVirtualError(message) {
+      virtualErrorMessageElement.textContent = message;
+    }
   </script>
 </body>
 </html>
