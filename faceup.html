@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Beauty - Phân tích da mặt</title>
+  <title>AI Beauty - Trợ lý làm đẹp thông minh</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root {
       --primary-color: #4285f4;
@@ -224,6 +225,134 @@
       font-size: 0.9rem;
     }
     
+    /* Chatbot Styles */
+    .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      height: 500px;
+    }
+    
+    .chatbot-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .chatbot-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+    
+    .chatbot-footer {
+      padding: 10px;
+      border-top: 1px solid #eee;
+      display: flex;
+    }
+    
+    #chatbotInput {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+    }
+    
+    #sendChatbotMessage {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0 15px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    
+    .message {
+      margin-bottom: 15px;
+      max-width: 80%;
+    }
+    
+    .user-message {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 18px 18px 0 18px;
+      margin-left: auto;
+    }
+    
+    .bot-message {
+      background-color: #e5e5ea;
+      color: black;
+      padding: 10px 15px;
+      border-radius: 18px 18px 18px 0;
+      margin-right: auto;
+    }
+    
+    .chatbot-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+    
+    .typing-indicator {
+      display: inline-block;
+      padding: 10px;
+    }
+    
+    .typing-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #888;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+    
     @media (max-width: 768px) {
       .container {
         padding: 10px;
@@ -232,14 +361,24 @@
       .upload-section, .results-section {
         padding: 20px;
       }
+      
+      .chatbot-container {
+        width: 90%;
+        right: 5%;
+        height: 60vh;
+      }
+      .chatbot-toggle {
+  display: flex !important; /* Hiển thị nút toggle */
+  background-color: red; /* Màu nổi bật để dễ nhận biết */
+}
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>AI Beauty - Phân tích da mặt</h1>
-      <p class="subtitle">Phát hiện và phân tích tình trạng da mặt từ hình ảnh</p>
+      <h1>AI Beauty - Trợ lý làm đẹp thông minh</h1>
+      <p class="subtitle">Phân tích da mặt và tư vấn làm đẹp với AI</p>
     </header>
     
     <section class="upload-section">
@@ -275,227 +414,418 @@
   </div>
   
   <footer>
-    <p>Ứng dụng sử dụng Face++ API | © 2023 AI Beauty Tool</p>
+    <p>Ứng dụng sử dụng Face++ API và OpenAI API | © 2023 AI Beauty</p>
   </footer>
+
+  <!-- Chatbot Toggle Button -->
+  <div class="chatbot-toggle" id="chatbotToggle">
+    <i class="fas fa-robot" style="font-size: 24px;"></i>
+  </div>
+
+  <!-- Chatbot Container -->
+  <div class="chatbot-container" id="chatbotContainer">
+    <div class="chatbot-header" id="chatbotHeader">
+      <h3>Trợ lý làm đẹp AI</h3>
+      <i class="fas fa-times" id="closeChatbot"></i>
+    </div>
+    <div class="chatbot-body" id="chatbotBody">
+      <!-- Messages will appear here -->
+    </div>
+    <div class="chatbot-footer">
+      <input type="text" id="chatbotInput" placeholder="Nhập câu hỏi về làm đẹp...">
+      <button id="sendChatbotMessage"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
 
   <script>
     // DOM Elements
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
-    const previewContainer = document.querySelector('.preview-container');
-    const detectButton = document.querySelector('.detect-button');
-    const loadingElement = document.querySelector('.loading');
-    const errorMessageElement = document.getElementById('errorMessage');
-    const resultsSection = document.getElementById('resultsSection');
-    const resultsContent = document.getElementById('resultsContent');
-    const facesCountElement = document.getElementById('facesCount');
+    // DOM Elements
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewContainer = document.querySelector('.preview-container');
+const detectButton = document.querySelector('.detect-button');
+const loadingElement = document.querySelector('.loading');
+const errorMessageElement = document.getElementById('errorMessage');
+const resultsSection = document.getElementById('resultsSection');
+const resultsContent = document.getElementById('resultsContent');
+const facesCountElement = document.getElementById('facesCount');
+
+// Chatbot Elements
+const chatbotToggle = document.getElementById('chatbotToggle');
+const chatbotContainer = document.getElementById('chatbotContainer');
+const chatbotHeader = document.getElementById('chatbotHeader');
+const chatbotBody = document.getElementById('chatbotBody');
+const chatbotInput = document.getElementById('chatbotInput');
+const sendChatbotMessage = document.getElementById('sendChatbotMessage');
+const closeChatbot = document.getElementById('closeChatbot');
+
+// Initialize
+imageInput.addEventListener('change', function(e) {
+  errorMessageElement.textContent = '';
+  
+  if (e.target.files.length > 0) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
     
-    // Initialize
-    imageInput.addEventListener('change', function(e) {
-      errorMessageElement.textContent = '';
-      
-      if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(event) {
-          imagePreview.src = event.target.result;
-          previewContainer.style.display = 'block';
-          detectButton.disabled = false;
-        };
-        
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.style.display = 'none';
-        detectButton.disabled = true;
-      }
+    reader.onload = function(event) {
+      imagePreview.src = event.target.result;
+      previewContainer.style.display = 'block';
+      detectButton.disabled = false;
+    };
+    
+    reader.readAsDataURL(file);
+  } else {
+    previewContainer.style.display = 'none';
+    detectButton.disabled = true;
+  }
+});
+
+// Skin Analysis Function
+async function analyzeSkin() {
+  const fileInput = document.getElementById('imageInput');
+  const imageFile = fileInput.files[0];
+  
+  if (!imageFile) {
+    showError('Vui lòng chọn ảnh trước khi phân tích');
+    return;
+  }
+  
+  // Show loading state
+  loadingElement.style.display = 'block';
+  detectButton.disabled = true;
+  resultsSection.style.display = 'none';
+  errorMessageElement.textContent = '';
+  
+  const formData = new FormData();
+  formData.append('api_key', 'dDx2i-nHse2VVbIBRzWR4AJ4bCigHAA6');
+  formData.append('api_secret', '9Exs6Apmafe30QHmRbdCwiw0G9jteRLc');
+  formData.append('image_file', imageFile);
+  formData.append('return_attributes', 'age,gender,skinstatus');
+  
+  try {
+    const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
+      method: 'POST',
+      body: formData
     });
     
-    // Main analysis function
-    async function analyzeSkin() {
-      const fileInput = document.getElementById('imageInput');
-      const imageFile = fileInput.files[0];
+    const data = await response.json();
+    
+    if (data.error_message) {
+      showError(`Lỗi API: ${data.error_message}`);
+      return;
+    }
+    
+    displaySkinResults(data);
+    
+    // Auto-generate a consultation request based on skin analysis
+    if (data.faces && data.faces.length > 0 && data.faces[0].attributes?.skinstatus) {
+      const skin = data.faces[0].attributes.skinstatus;
+      const concerns = [];
       
-      if (!imageFile) {
-        showError('Vui lòng chọn ảnh trước khi phân tích');
-        return;
+      if (skin.oil > 50) concerns.push('da dầu');
+      if (skin.dark_circle > 30) concerns.push('quầng thâm');
+      if (skin.stain > 20) concerns.push('tàn nhang');
+      if (skin.acne > 15) concerns.push('mụn');
+      
+      if (concerns.length > 0) {
+        setTimeout(() => {
+          sendToChatbot(`Tôi có làn da ${concerns.join(', ')}. Bạn có thể tư vấn giúp tôi không?`);
+        }, 1500);
       }
+    }
+  } catch (err) {
+    showError('Gặp lỗi khi kết nối đến API: ' + err.message);
+    console.error(err);
+  } finally {
+    loadingElement.style.display = 'none';
+    detectButton.disabled = false;
+  }
+}
+
+// Display Skin Results
+function displaySkinResults(data) {
+  resultsContent.innerHTML = '';
+  
+  if (!data.faces || data.faces.length === 0) {
+    showError('Không phát hiện khuôn mặt nào trong ảnh');
+    return;
+  }
+  
+  // Update faces count
+  facesCountElement.textContent = `Đã phát hiện: ${data.faces.length} khuôn mặt`;
+  
+  // Process each face
+  data.faces.forEach((face, index) => {
+    const faceCard = document.createElement('div');
+    faceCard.className = 'face-card';
+    
+    const faceTitle = document.createElement('h3');
+    faceTitle.textContent = `Khuôn mặt ${index + 1}`;
+    faceCard.appendChild(faceTitle);
+    
+    // Basic info
+    if (face.attributes) {
+      const attrs = face.attributes;
       
-      // Show loading state
-      loadingElement.style.display = 'block';
-      detectButton.disabled = true;
-      resultsSection.style.display = 'none';
-      errorMessageElement.textContent = '';
+      // Gender and age
+      addAttribute(faceCard, 'Giới tính', attrs.gender.value, attrs.gender.confidence);
+      addAttribute(faceCard, 'Tuổi', attrs.age.value);
       
-      const formData = new FormData();
-      formData.append('api_key', 'dDx2i-nHse2VVbIBRzWR4AJ4bCigHAA6');
-      formData.append('api_secret', '9Exs6Apmafe30QHmRbdCwiw0G9jteRLc');
-      formData.append('image_file', imageFile);
-      formData.append('return_attributes', 'age,gender,skinstatus');
-      
-      try {
-        const response = await fetch('https://api-us.faceplusplus.com/facepp/v3/detect', {
-          method: 'POST',
-          body: formData
-        });
+      // Skin analysis
+      if (attrs.skinstatus) {
+        const skin = attrs.skinstatus;
         
-        const data = await response.json();
+        // Skin health progress bars
+        addSkinAttribute(faceCard, 'Độ dầu da', skin.oil);
+        addSkinAttribute(faceCard, 'Quầng thâm', skin.dark_circle);
+        addSkinAttribute(faceCard, 'Tàn nhang', skin.stain);
+        addSkinAttribute(faceCard, 'Mụn', skin.acne);
+        addSkinAttribute(faceCard, 'Độ khỏe da', skin.health, true);
         
-        if (data.error_message) {
-          showError(`Lỗi API: ${data.error_message}`);
-          return;
-        }
+        // Skin analysis summary
+        const skinSummary = getSkinSummary(skin);
+        addAttribute(faceCard, 'Đánh giá tổng quan', skinSummary);
         
-        displaySkinResults(data);
-      } catch (err) {
-        showError('Gặp lỗi khi kết nối đến API: ' + err.message);
-        console.error(err);
-      } finally {
-        loadingElement.style.display = 'none';
-        detectButton.disabled = false;
+        // Skin care suggestions
+        const suggestions = getSkinCareSuggestions(skin);
+        addAttribute(faceCard, 'Gợi ý chăm sóc da', suggestions);
       }
     }
     
-    // Display skin analysis results
-    function displaySkinResults(data) {
-      resultsContent.innerHTML = '';
-      
-      if (!data.faces || data.faces.length === 0) {
-        showError('Không phát hiện khuôn mặt nào trong ảnh');
-        return;
-      }
-      
-      // Update faces count
-      facesCountElement.textContent = `Đã phát hiện: ${data.faces.length} khuôn mặt`;
-      
-      // Process each face
-      data.faces.forEach((face, index) => {
-        const faceCard = document.createElement('div');
-        faceCard.className = 'face-card';
-        
-        const faceTitle = document.createElement('h3');
-        faceTitle.textContent = `Khuôn mặt ${index + 1}`;
-        faceCard.appendChild(faceTitle);
-        
-        // Basic info
-        if (face.attributes) {
-          const attrs = face.attributes;
-          
-          // Gender and age
-          addAttribute(faceCard, 'Giới tính', attrs.gender.value, attrs.gender.confidence);
-          addAttribute(faceCard, 'Tuổi', attrs.age.value);
-          
-          // Skin analysis
-          if (attrs.skinstatus) {
-            const skin = attrs.skinstatus;
-            
-            // Skin health progress bars
-            addSkinAttribute(faceCard, 'Độ dầu da', skin.oil);
-            addSkinAttribute(faceCard, 'Quầng thâm', skin.dark_circle);
-            addSkinAttribute(faceCard, 'Tàn nhang', skin.stain);
-            addSkinAttribute(faceCard, 'Mụn', skin.acne);
-            addSkinAttribute(faceCard, 'Độ khỏe da', skin.health, true);
-            
-            // Skin analysis summary
-            const skinSummary = getSkinSummary(skin);
-            addAttribute(faceCard, 'Đánh giá tổng quan', skinSummary);
-            
-            // Skin care suggestions
-            const suggestions = getSkinCareSuggestions(skin);
-            addAttribute(faceCard, 'Gợi ý chăm sóc da', suggestions);
-          }
-        }
-        
-        resultsContent.appendChild(faceCard);
-      });
-      
-      resultsSection.style.display = 'block';
-    }
+    resultsContent.appendChild(faceCard);
+  });
+  
+  resultsSection.style.display = 'block';
+}
+
+// Helper function to add skin attributes with progress bars
+function addSkinAttribute(container, label, value, isPositive = false) {
+  const div = document.createElement('div');
+  div.className = 'attribute';
+  
+  // Reverse the value for positive attributes (like skin health)
+  const displayValue = isPositive ? value : value;
+  const progressColor = isPositive ? 'var(--secondary-color)' : 'var(--primary-color)';
+  
+  div.innerHTML = `
+    <div class="attribute-label">${label}: <span class="attribute-value">${displayValue}%</span></div>
+    <div class="skin-progress">
+      <div class="skin-progress-bar" style="width: ${displayValue}%; background-color: ${progressColor}"></div>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+// Helper function to add regular attributes
+function addAttribute(container, label, value, confidence = null) {
+  const div = document.createElement('div');
+  div.className = 'attribute';
+  
+  let html = `<span class="attribute-label">${label}: </span>
+              <span class="attribute-value">${value}`;
+  
+  if (confidence !== null) {
+    html += ` <small>(${Math.round(confidence)}% chính xác)</small>`;
+  }
+  
+  html += `</span>`;
+  div.innerHTML = html;
+  container.appendChild(div);
+}
+
+// Generate skin summary based on analysis
+function getSkinSummary(skin) {
+  const issues = [];
+  
+  if (skin.oil > 50) issues.push('da dầu');
+  if (skin.dark_circle > 30) issues.push('quầng thâm');
+  if (skin.stain > 20) issues.push('tàn nhang');
+  if (skin.acne > 15) issues.push('mụn');
+  
+  if (issues.length === 0) {
+    return 'Da bạn đang trong tình trạng tốt';
+  }
+  
+  return `Da bạn có dấu hiệu ${issues.join(', ')}`;
+}
+
+// Generate skin care suggestions
+function getSkinCareSuggestions(skin) {
+  const suggestions = [];
+  
+  if (skin.oil > 50) {
+    suggestions.push('Nên sử dụng sữa rửa mặt kiểm soát dầu');
+  }
+  
+  if (skin.dark_circle > 30) {
+    suggestions.push('Cần ngủ đủ giấc và dùng kem mắt giảm quầng thâm');
+  }
+  
+  if (skin.stain > 20) {
+    suggestions.push('Nên dùng kem chống nắng và sản phẩm giảm thâm nám');
+  }
+  
+  if (skin.acne > 15) {
+    suggestions.push('Cần làm sạch da kỹ và dùng sản phẩm trị mụn');
+  }
+  
+  if (skin.health < 60) {
+    suggestions.push('Nên uống nhiều nước và bổ sung vitamin cho da');
+  }
+  
+  return suggestions.length > 0 
+    ? suggestions.join('. ') + '.' 
+    : 'Tiếp tục chăm sóc da theo routine hiện tại';
+}
+
+function showError(message) {
+  errorMessageElement.textContent = message;
+  resultsSection.style.display = 'none';
+}
+
+// Chatbot Functions
+chatbotToggle.addEventListener('click', () => {
+  chatbotContainer.style.display = 'flex';
+  chatbotToggle.style.display = 'none';
+});
+
+closeChatbot.addEventListener('click', () => {
+  chatbotContainer.style.display = 'none';
+  chatbotToggle.style.display = 'flex';
+});
+
+chatbotHeader.addEventListener('click', () => {
+  if (chatbotContainer.style.height === '60px') {
+    chatbotContainer.style.height = '500px';
+  } else {
+    chatbotContainer.style.height = '60px';
+  }
+});
+
+// Send message when Enter is pressed
+chatbotInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+sendChatbotMessage.addEventListener('click', sendMessage);
+
+function sendMessage() {
+  const message = chatbotInput.value.trim();
+  if (message === '') return;
+  
+  addMessage(message, 'user');
+  chatbotInput.value = '';
+  
+  // Show typing indicator
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'message bot-message typing-indicator';
+  typingIndicator.innerHTML = `
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+  `;
+  chatbotBody.appendChild(typingIndicator);
+  chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  
+  // Get AI response
+  getAIResponse(message)
+    .then(response => {
+      chatbotBody.removeChild(typingIndicator);
+      addMessage(response, 'bot');
+    })
+    .catch(error => {
+      chatbotBody.removeChild(typingIndicator);
+      addMessage('Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu của bạn.', 'bot');
+      console.error('Chatbot error:', error);
+    });
+}
+
+function addMessage(text, sender) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${sender}-message`;
+  messageDiv.textContent = text;
+  chatbotBody.appendChild(messageDiv);
+  chatbotBody.scrollTop = chatbotBody.scrollHeight;
+}
+
+function sendToChatbot(text) {
+  chatbotContainer.style.display = 'flex';
+  chatbotToggle.style.display = 'none';
+  addMessage(text, 'user');
+  
+  // Show typing indicator
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'message bot-message typing-indicator';
+  typingIndicator.innerHTML = `
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+  `;
+  chatbotBody.appendChild(typingIndicator);
+  chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  
+  // Get AI response
+  getAIResponse(text)
+    .then(response => {
+      chatbotBody.removeChild(typingIndicator);
+      addMessage(response, 'bot');
+    })
+    .catch(error => {
+      chatbotBody.removeChild(typingIndicator);
+      addMessage('Xin lỗi, tôi gặp lỗi khi xử lý yêu cầu của bạn.', 'bot');
+    });
+}
+
+// Thay đổi phần khởi tạo chatbot
+window.addEventListener('load', () => {
+  // Hiển thị chatbot toggle ngay từ đầu
+  chatbotToggle.style.display = 'flex';
+  
+  // Thêm lời chào ban đầu
+  setTimeout(() => {
+    addMessage("Xin chào! Tôi là trợ lý làm đẹp AI. Tôi có thể giúp gì cho bạn về chăm sóc da và làm đẹp?", 'bot');
+  }, 1000);
+});
+
+// Sửa hàm getAIResponse
+async function getAIResponse(message) {
+  // Thay thế bằng API key thật của bạn
+  const OPENAI_API_KEY = "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"; 
+  
+  if (!OPENAI_API_KEY || OPENAI_API_KEY.includes("your-real-api-key")) {
+    return "Vui lòng cung cấp API key OpenAI hợp lệ để sử dụng tính năng này.";
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Bạn là chuyên gia làm đẹp AI. Hãy trả lời bằng tiếng Việt, ngắn gọn và thân thiện."
+          },
+          { role: "user", content: message }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
     
-    // Helper function to add skin attributes with progress bars
-    function addSkinAttribute(container, label, value, isPositive = false) {
-      const div = document.createElement('div');
-      div.className = 'attribute';
-      
-      // Reverse the value for positive attributes (like skin health)
-      const displayValue = isPositive ? (100 - value) : value;
-      const progressColor = isPositive ? 'var(--secondary-color)' : 'var(--primary-color)';
-      
-      div.innerHTML = `
-        <div class="attribute-label">${label}: <span class="attribute-value">${displayValue}%</span></div>
-        <div class="skin-progress">
-          <div class="skin-progress-bar" style="width: ${displayValue}%; background-color: ${progressColor}"></div>
-        </div>
-      `;
-      container.appendChild(div);
-    }
-    
-    // Helper function to add regular attributes
-    function addAttribute(container, label, value, confidence = null) {
-      const div = document.createElement('div');
-      div.className = 'attribute';
-      
-      let html = `<span class="attribute-label">${label}: </span>
-                  <span class="attribute-value">${value}`;
-      
-      if (confidence !== null) {
-        html += ` <small>(${Math.round(confidence)}% chính xác)</small>`;
-      }
-      
-      html += `</span>`;
-      div.innerHTML = html;
-      container.appendChild(div);
-    }
-    
-    // Generate skin summary based on analysis
-    function getSkinSummary(skin) {
-      const issues = [];
-      
-      if (skin.oil > 50) issues.push('da dầu');
-      if (skin.dark_circle > 30) issues.push('quầng thâm');
-      if (skin.stain > 20) issues.push('tàn nhang');
-      if (skin.acne > 15) issues.push('mụn');
-      
-      if (issues.length === 0) {
-        return 'Da bạn đang trong tình trạng tốt';
-      }
-      
-      return `Da bạn có dấu hiệu ${issues.join(', ')}`;
-    }
-    
-    // Generate skin care suggestions
-    function getSkinCareSuggestions(skin) {
-      const suggestions = [];
-      
-      if (skin.oil > 50) {
-        suggestions.push('Nên sử dụng sữa rửa mặt kiểm soát dầu');
-      }
-      
-      if (skin.dark_circle > 30) {
-        suggestions.push('Cần ngủ đủ giấc và dùng kem mắt giảm quầng thâm');
-      }
-      
-      if (skin.stain > 20) {
-        suggestions.push('Nên dùng kem chống nắng và sản phẩm giảm thâm nám');
-      }
-      
-      if (skin.acne > 15) {
-        suggestions.push('Cần làm sạch da kỹ và dùng sản phẩm trị mụn');
-      }
-      
-      if (skin.health < 60) {
-        suggestions.push('Nên uống nhiều nước và bổ sung vitamin cho da');
-      }
-      
-      return suggestions.length > 0 
-        ? suggestions.join('. ') + '.' 
-        : 'Tiếp tục chăm sóc da theo routine hiện tại';
-    }
-    
-    function showError(message) {
-      errorMessageElement.textContent = message;
-      resultsSection.style.display = 'none';
-    }
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("Lỗi OpenAI:", error);
+    return "Xin lỗi, tôi gặp lỗi khi kết nối AI. Vui lòng thử lại!";
+  }
+}
   </script>
 </body>
 </html>
